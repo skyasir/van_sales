@@ -56,6 +56,16 @@ required_apps = ["erpnext"]
 # include app icons in desk
 # app_include_icons = "van_sales/public/icons.svg"
 
+# Website
+# -------
+
+# The mobile app is a single-page app served from the site itself, so every
+# in-app route has to resolve to the same entry page. Without this, a rep who
+# reloads on /van_sales/customers gets a 404 instead of the app.
+website_route_rules = [
+	{"from_route": "/van_sales/<path:app_path>", "to_route": "van_sales"},
+]
+
 # Home Pages
 # ----------
 

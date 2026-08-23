@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no"
+		/>
+		<title>Van Sales</title>
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-title" content="Van Sales" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<meta name="theme-color" content="#101828" />
+
+		<link rel="icon" type="image/png" href="/assets/van_sales/manifest/icon-192.png" />
+		<link rel="apple-touch-icon" href="/assets/van_sales/manifest/icon-192.png" />
+	</head>
+	<body class="antialiased">
+		<div id="app"></div>
+		<div id="modals"></div>
+		<div id="popovers"></div>
+
+		<!-- Everything else the page needs is injected from `boot` by
+		     frappe-ui's jinja plugin at build time. -->
+		<script>
+			window.csrf_token = "{{ csrf_token }}"
+		</script>
+
+		<script type="module" src="/src/main.js"></script>
+	</body>
+</html>
