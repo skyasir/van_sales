@@ -6,14 +6,56 @@ Mobile field operations for ERPNext: van sales, pre-sales, logistics, picking
 and management, in one app whose screens are decided by the signed-in user's
 ERPNext roles.
 
-One repository, two halves:
+One repository, three parts:
 
 ```
 van_sales/          Frappe app  -- doctypes, policy and the mobile API
-mobile/             Expo app    -- React Native client (Android / iOS)
+frontend/           Frappe UI   -- Vue 3 client, served by the bench as a PWA
+mobile/             Expo app    -- the earlier React Native client
 ```
 
-## Testing on an emulator
+The Frappe UI front end is the current client. It is built with Vue 3 and
+`frappe-ui`, and served by the bench itself at `/van_sales`, so a rep installs
+it from the browser rather than from a store. The React Native app in
+`mobile/` is the build it replaces and is kept for reference; both speak to
+the same whitelisted methods in `van_sales/api/`, so the backend never had to
+change.
+
+## The Frappe UI front end
+
+```bash
+cd frontend
+yarn install
+yarn dev      # Vite on :8081, proxying the bench
+yarn build    # -> van_sales/public/frontend + www/van_sales.html
+```
+
+`yarn build` writes the bundle into the app's `public/frontend` folder and
+copies the built entry page to `van_sales/www/van_sales.html`. Both are build
+output and are gitignored; a fresh clone needs one `yarn build` before the
+route serves anything.
+
+Two things are worth knowing about how it talks to Frappe.
+
+**Two transports, one call signature.** Served from the bench the app is
+same-origin and rides the ordinary session cookie plus the CSRF token the
+entry page carries. Wrapped by Capacitor it would run on a `capacitor://`
+origin where that cookie cannot follow, so it falls back to the API key pair
+`van_sales.api.auth.login` issues and an absolute base URL. Nothing above
+`src/data/request.js` knows which one is in use.
+
+**Errors are unwrapped, and "no signal" is not "no".** Frappe puts the message
+a human should read inside `_server_messages`; without unwrapping it every
+validation failure reaches the rep as "Internal Server Error" and they never
+learn the credit limit stopped them. And a request that never left the handset
+is told apart from one the server refused, because a van drives through
+basements all day: the first is worth retrying and the second is not.
+
+Deep links work because `website_route_rules` in `hooks.py` maps
+`/van_sales/<path>` onto the single entry page -- without it a rep who reloads
+on `/van_sales/customers` gets a 404 instead of the app.
+
+## Testing the React Native build on an emulator
 
 The API can be exercised with curl, but that proves nothing about whether
 the APK can call it -- a release build once failed every request because
