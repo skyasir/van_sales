@@ -11,17 +11,17 @@
 		- A hit that is not on the van is shown, not hidden. The rep may still
 		  sell it if the van count is wrong, but they are told first.
 	-->
-	<div class="flex min-h-full flex-col bg-black">
+	<div class="flex min-h-full flex-col bg-surface-gray-1">
 		<PageHeader title="Scan" :subtitle="cart.customer?.customer_name ?? ''" back />
 
 		<!-- No BarcodeDetector means no scanning, and pretending otherwise
 		     would leave the rep pointing a camera at a label forever. -->
 		<div v-if="!supported" class="flex flex-1 flex-col items-center justify-center gap-3 p-6">
-			<FeatherIcon name="camera-off" class="h-10 w-10 text-van-placeholder" />
-			<p class="text-center text-base font-semibold text-white">
+			<FeatherIcon name="camera-off" class="h-10 w-10 text-ink-gray-4" />
+			<p class="text-center text-lg font-semibold text-ink-gray-9">
 				This browser cannot scan barcodes
 			</p>
-			<p class="text-center text-[13px] leading-5 text-white/60">
+			<p class="text-center text-[13px] leading-5 text-ink-gray-6">
 				Barcode detection is not available here. Every line has to be searched instead.
 			</p>
 			<Button
@@ -35,11 +35,11 @@
 		</div>
 
 		<div v-else-if="denied" class="flex flex-1 flex-col items-center justify-center gap-3 p-6">
-			<FeatherIcon name="camera-off" class="h-10 w-10 text-van-placeholder" />
-			<p class="text-center text-base font-semibold text-white">
+			<FeatherIcon name="camera-off" class="h-10 w-10 text-ink-gray-4" />
+			<p class="text-center text-lg font-semibold text-ink-gray-9">
 				Camera access is needed to scan
 			</p>
-			<p class="text-center text-[13px] leading-5 text-white/60">
+			<p class="text-center text-[13px] leading-5 text-ink-gray-6">
 				Scanning is how items reach an invoice. Without the camera every line has to be
 				typed.
 			</p>
@@ -49,41 +49,40 @@
 			<!-- Never a dead end. A refused camera must not stop the sale, so
 			     the typed path is offered right here rather than left to be
 			     found. -->
-			<Button
-				class="w-full !text-white"
-				variant="outline"
-				@click="router.replace({ name: 'items' })"
-			>
+			<Button class="w-full" variant="outline" @click="router.replace({ name: 'items' })">
 				Search for the item instead
 			</Button>
 		</div>
 
-		<div v-else class="relative flex-1">
+		<div v-else class="relative flex-1 bg-black">
 			<video ref="video" class="h-full w-full object-cover" muted playsinline />
 
 			<!-- A window to aim through. Without it reps hold the phone too far
 			     back and every read fails. -->
 			<div class="pointer-events-none absolute inset-0 flex items-center justify-center">
-				<div class="h-40 w-[78%] rounded-2xl border-2 border-white/80 shadow-raised" />
+				<div class="h-40 w-[78%] rounded-2xl border-2 border-white/80 shadow-lg" />
 			</div>
 
 			<div
 				v-if="busy"
-				class="absolute left-1/2 top-6 -translate-x-1/2 rounded-full bg-black/70 px-3 py-1.5"
+				class="absolute left-1/2 top-6 -translate-x-1/2 rounded-full bg-surface-gray-7 px-3 py-1.5"
 			>
-				<LoadingIndicator class="h-4 w-4 text-white" />
+				<LoadingIndicator class="h-4 w-4 text-ink-white" />
 			</div>
 
 			<div class="safe-bottom absolute inset-x-0 bottom-0 p-3.5">
-				<div v-if="hit" class="van-card p-3.5">
-					<p class="text-[15px] font-semibold text-van-text">{{ hit.item_name }}</p>
-					<p class="money mt-1 text-[11.5px] font-medium text-van-faint">
+				<div
+					v-if="hit"
+					class="rounded-lg border border-outline-gray-2 bg-surface-white shadow-sm p-3.5"
+				>
+					<p class="text-[15px] font-semibold text-ink-gray-8">{{ hit.item_name }}</p>
+					<p class="money mt-1 text-[11.5px] font-medium text-ink-gray-5">
 						{{ hit.item_code }} · {{ hit.uom }}
 					</p>
 					<StockTag class="mt-2" :van-qty="hit.van_qty" :uom="hit.uom" />
 
 					<div class="mt-3 flex items-center justify-between">
-						<span class="money text-xl font-semibold text-van-text">{{
+						<span class="money text-xl font-semibold text-ink-gray-8">{{
 							money(hit.rate)
 						}}</span>
 						<Button variant="solid" theme="blue" @click="addToInvoice"
@@ -94,10 +93,10 @@
 
 				<div
 					v-else-if="miss"
-					class="rounded-card border border-warn-border bg-warn-wash p-3.5"
+					class="rounded-lg border border-outline-amber-2 bg-surface-amber-1 p-3.5"
 				>
-					<p class="text-[13.5px] font-bold text-warn-ink">Not recognised</p>
-					<p class="money mt-1 text-[12.5px] text-warn-ink">{{ miss }}</p>
+					<p class="text-[13.5px] font-bold text-ink-amber-3">Not recognised</p>
+					<p class="money mt-1 text-[12.5px] text-ink-amber-3">{{ miss }}</p>
 					<Button
 						class="mt-2"
 						variant="subtle"
@@ -107,7 +106,7 @@
 					</Button>
 				</div>
 
-				<p v-else class="text-center text-[13px] text-white/70">
+				<p v-else class="text-center text-[13px] text-ink-gray-6">
 					Point the camera at a barcode
 				</p>
 			</div>

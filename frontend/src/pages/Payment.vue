@@ -15,11 +15,9 @@
 		<PageHeader title="Payment" :subtitle="cart.customer?.customer_name ?? ''" back />
 
 		<ScreenBody v-if="!cart.customer || !cart.lines.length">
-			<Banner
-				variant="info"
-				title="Nothing to settle"
-				body="Pick a customer and scan at least one item first."
-			/>
+			<Alert theme="blue" title="Nothing to settle" :dismissable="false">
+				Pick a customer and scan at least one item first.
+			</Alert>
 			<Button
 				variant="solid"
 				theme="blue"
@@ -33,43 +31,35 @@
 		<ScreenBody v-else>
 			<MoneyPanel>
 				<div class="flex flex-col items-center">
-					<p class="text-[11px] font-bold uppercase tracking-[0.1em] text-white/50">
+					<p class="text-[11px] font-bold uppercase tracking-[0.1em] text-ink-gray-5">
 						Amount due
 					</p>
-					<p class="money mt-1.5 text-[40px] font-semibold -tracking-[0.03em] text-white">
+					<p
+						class="money mt-1.5 text-[40px] font-semibold -tracking-[0.03em] text-ink-gray-9"
+					>
 						{{ money(total) }}
 					</p>
-					<p class="mt-0.5 text-[11.5px] text-white/50">
+					<p class="mt-0.5 text-[11.5px] text-ink-gray-5">
 						{{ session.van?.currency }} · {{ cart.lines.length }} lines
 					</p>
 				</div>
 			</MoneyPanel>
 
-			<div class="flex gap-2">
-				<button
-					v-for="option in TENDERS"
-					:key="option.key"
-					type="button"
-					class="flex h-touch flex-1 items-center justify-center rounded-xl border text-[14px] font-bold"
-					:class="
-						tender === option.key
-							? 'border-brand bg-brand-wash text-brand-dark'
-							: 'border-van-border bg-van-card text-van-text'
-					"
-					@click="tender = option.key"
-				>
-					{{ option.label }}
-				</button>
-			</div>
+			<TabButtons v-model="tender" class="w-full" :buttons="TENDERS" />
 
-			<div v-if="tender === 'cash'" class="van-card p-3.5">
-				<p class="section-label">Cash tendered</p>
+			<div
+				v-if="tender === 'cash'"
+				class="rounded-lg border border-outline-gray-2 bg-surface-white shadow-sm p-3.5"
+			>
+				<p class="text-p-sm font-medium uppercase tracking-wide text-ink-gray-5">
+					Cash tendered
+				</p>
 				<input
 					v-model="tendered"
 					type="text"
 					inputmode="decimal"
 					:placeholder="money(total)"
-					class="money mt-2 h-14 w-full rounded-xl border border-van-border bg-van-bg px-3.5 text-2xl font-semibold text-van-text placeholder:text-van-placeholder focus:border-brand focus:outline-none"
+					class="money mt-2 h-14 w-full rounded-xl border border-outline-gray-2 bg-surface-gray-1 px-3.5 text-2xl font-semibold text-ink-gray-8 placeholder:text-ink-gray-4 focus:border-outline-blue-1 focus:outline-none"
 				/>
 
 				<div class="mt-3 flex gap-[7px]">
@@ -77,42 +67,41 @@
 						v-for="(preset, i) in cashPresets"
 						:key="i"
 						type="button"
-						class="money flex h-10 flex-1 items-center justify-center rounded-[9px] border border-van-border bg-van-card text-[13.5px] font-semibold text-van-text active:bg-van-subtle"
+						class="money flex h-10 flex-1 items-center justify-center rounded-[9px] border border-outline-gray-2 bg-surface-white text-[13.5px] font-semibold text-ink-gray-8 active:bg-surface-gray-2"
 						@click="tendered = String(Math.round(preset))"
 					>
 						{{ i === 0 ? "Exact" : money(preset, 0) }}
 					</button>
 				</div>
 
-				<div class="mt-3 flex items-center justify-between border-t border-van-subtle pt-3">
-					<span class="text-[13px] text-van-muted">Change due</span>
-					<span class="money text-base font-semibold text-ok">{{ money(change) }}</span>
+				<div
+					class="mt-3 flex items-center justify-between border-t border-outline-gray-1 pt-3"
+				>
+					<span class="text-[13px] text-ink-gray-6">Change due</span>
+					<span class="money text-base font-semibold text-ink-green-3">{{
+						money(change)
+					}}</span>
 				</div>
 			</div>
 
-			<div v-if="tender === 'cheque'" class="van-card p-3.5">
-				<p class="section-label">Cheque details</p>
+			<div
+				v-if="tender === 'cheque'"
+				class="rounded-lg border border-outline-gray-2 bg-surface-white shadow-sm p-3.5"
+			>
+				<p class="text-p-sm font-medium uppercase tracking-wide text-ink-gray-5">
+					Cheque details
+				</p>
 				<div class="mt-2 flex flex-col gap-3">
-					<label class="flex flex-col gap-1">
-						<span class="text-xs font-semibold text-van-muted">Cheque number</span>
-						<input
-							v-model="chequeNo"
-							type="text"
-							inputmode="numeric"
-							placeholder="004518"
-							class="money h-12 rounded-xl border border-van-border bg-van-bg px-3.5 text-[15px] text-van-text placeholder:text-van-placeholder focus:border-brand focus:outline-none"
-						/>
-					</label>
-					<label class="flex flex-col gap-1">
-						<span class="text-xs font-semibold text-van-muted">Value date</span>
-						<input
-							v-model="valueDate"
-							type="date"
-							class="money h-12 rounded-xl border border-van-border bg-van-bg px-3.5 text-[15px] text-van-text focus:border-brand focus:outline-none"
-						/>
-					</label>
+					<FormControl
+						v-model="chequeNo"
+						label="Cheque number"
+						type="text"
+						size="md"
+						placeholder="004518"
+					/>
+					<FormControl v-model="valueDate" label="Value date" type="date" size="md" />
 				</div>
-				<p class="mt-3 text-[12px] leading-[18px] text-van-muted">
+				<p class="mt-3 text-[12px] leading-[18px] text-ink-gray-6">
 					Leave the value date today for a cheque you are banking now. A future date makes
 					it post-dated, and a post-dated cheque cannot settle the invoice — record it
 					from the customer's Collect payment screen instead, so it is held until it
@@ -120,14 +109,18 @@
 				</p>
 			</div>
 
-			<Banner
+			<Alert
 				v-if="tender === 'credit' && quote"
-				:variant="quote.credit.over_limit ? 'warning' : 'info'"
+				:theme="quote.credit.over_limit ? 'yellow' : 'blue'"
 				:title="creditTitle"
-				:body="creditBody"
-			/>
+				:dismissable="false"
+			>
+				{{ creditBody }}
+			</Alert>
 
-			<Banner v-if="error" variant="danger" title="Not posted" :body="error" />
+			<Alert v-if="error" theme="red" title="Not posted" :dismissable="false">
+				{{ error }}
+			</Alert>
 
 			<Button
 				class="h-[54px]"
@@ -144,11 +137,10 @@
 </template>
 
 <script setup>
-import { Button } from "frappe-ui"
+import { Alert, Button, FormControl, TabButtons } from "frappe-ui"
 import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 
-import Banner from "../components/Banner.vue"
 import MoneyPanel from "../components/MoneyPanel.vue"
 import PageHeader from "../components/PageHeader.vue"
 import ScreenBody from "../components/ScreenBody.vue"
@@ -162,9 +154,9 @@ import { policy, session } from "../data/session"
 const router = useRouter()
 
 const TENDERS = [
-	{ key: "cash", label: "Cash" },
-	{ key: "cheque", label: "Cheque" },
-	{ key: "credit", label: "Credit" },
+	{ label: "Cash", value: "cash" },
+	{ label: "Cheque", value: "cheque" },
+	{ label: "Credit", value: "credit" },
 ]
 
 const tender = ref("cash")

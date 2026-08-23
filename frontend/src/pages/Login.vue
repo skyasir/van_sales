@@ -7,106 +7,88 @@
 		practice. Served from the bench it is hidden: the origin already names
 		the site, and asking a rep to retype it would only invite a typo.
 	-->
-	<div class="flex min-h-full flex-col bg-[#101828] px-[22px]">
-		<div class="safe-top flex flex-1 flex-col gap-3 pb-8 pt-10">
-			<img :src="logo" alt="" class="mx-auto h-24 w-24 object-contain" />
+	<div class="flex min-h-full flex-col bg-surface-gray-1 px-5">
+		<div class="safe-top mx-auto flex w-full max-w-sm flex-1 flex-col gap-4 pb-8 pt-12">
+			<img :src="logo" alt="" class="mx-auto h-20 w-20 object-contain" />
 
-			<h1 class="mt-3 text-[26px] font-semibold -tracking-[0.02em] text-white">Sign in</h1>
-			<p class="-mt-2 text-[13.5px] text-white/55">Field Operations</p>
-
-			<div
-				v-if="session.staleSession"
-				class="rounded-xl border border-[rgba(240,213,172,0.4)] bg-[rgba(220,104,3,0.16)] p-3"
-			>
-				<p class="text-[12.5px] leading-[18px] text-[#F5C88B]">
-					You have been offline past the allowed window. Sign in again to keep working.
-				</p>
+			<div>
+				<h1 class="text-2xl font-semibold text-ink-gray-9">Sign in</h1>
+				<p class="mt-1 text-base text-ink-gray-6">Field Operations</p>
 			</div>
 
-			<form class="mt-2 flex flex-col gap-3" @submit.prevent="submit">
-				<label v-if="needsSite" class="flex flex-col gap-[7px]">
-					<span class="text-[11px] font-bold uppercase tracking-[0.09em] text-white/45">
-						Site address
-					</span>
-					<input
-						v-model="site"
-						type="url"
-						inputmode="url"
-						autocapitalize="none"
-						autocorrect="off"
-						placeholder="192.168.1.10:8000 or erp.example.com"
-						class="money h-[54px] rounded-xl border border-white/[0.16] bg-white/[0.06] px-3.5 text-[14.5px] text-white placeholder:text-white/30 focus:border-brand focus:outline-none"
-					/>
-				</label>
+			<Alert
+				v-if="session.staleSession"
+				title="Offline session expired"
+				theme="yellow"
+				:dismissable="false"
+			>
+				You have been offline past the allowed window. Sign in again to keep working.
+			</Alert>
 
-				<label class="flex flex-col gap-[7px]">
-					<span class="text-[11px] font-bold uppercase tracking-[0.09em] text-white/45">
-						User ID
-					</span>
-					<input
-						v-model="usr"
-						type="email"
-						inputmode="email"
-						autocapitalize="none"
-						autocorrect="off"
-						autocomplete="username"
-						placeholder="name@example.ae"
-						class="h-[54px] rounded-xl border border-white/[0.16] bg-white/[0.06] px-3.5 text-[15.5px] text-white placeholder:text-white/30 focus:border-brand focus:outline-none"
-					/>
-				</label>
+			<form class="flex flex-col gap-4" @submit.prevent="submit">
+				<FormControl
+					v-if="needsSite"
+					v-model="site"
+					label="Site address"
+					type="text"
+					size="md"
+					placeholder="192.168.1.10:8000 or erp.example.com"
+					autocapitalize="none"
+					autocorrect="off"
+				/>
 
-				<label class="flex flex-col gap-[7px]">
-					<span class="text-[11px] font-bold uppercase tracking-[0.09em] text-white/45">
-						Password
-					</span>
-					<div
-						class="flex h-[54px] items-center rounded-xl border border-white/[0.16] bg-white/[0.06] px-3.5 focus-within:border-brand"
-					>
-						<input
-							v-model="pwd"
-							:type="showPwd ? 'text' : 'password'"
-							autocapitalize="none"
-							autocomplete="current-password"
-							placeholder="••••••••"
-							class="min-w-0 flex-1 bg-transparent text-[15.5px] text-white placeholder:text-white/30 focus:outline-none"
-						/>
+				<FormControl
+					v-model="usr"
+					label="User ID"
+					type="email"
+					size="md"
+					placeholder="name@example.ae"
+					autocomplete="username"
+					autocapitalize="none"
+				/>
+
+				<FormControl
+					v-model="pwd"
+					label="Password"
+					:type="showPwd ? 'text' : 'password'"
+					size="md"
+					placeholder="••••••••"
+					autocomplete="current-password"
+				>
+					<template #suffix>
 						<button
 							type="button"
-							class="px-1.5 py-2 text-xs font-bold text-[#8FB0FF]"
+							class="text-p-sm font-medium text-ink-blue-2"
 							@click="showPwd = !showPwd"
 						>
-							{{ showPwd ? "HIDE" : "SHOW" }}
+							{{ showPwd ? "Hide" : "Show" }}
 						</button>
-					</div>
-				</label>
+					</template>
+				</FormControl>
 
-				<div
-					v-if="error"
-					class="rounded-xl border border-[rgba(242,199,199,0.35)] bg-[rgba(217,45,32,0.16)] p-3"
-				>
-					<p class="whitespace-pre-line text-[13px] leading-[19px] text-[#FDA29B]">
-						{{ error }}
-					</p>
-				</div>
+				<ErrorMessage v-if="error" :message="error" />
 
-				<button
+				<Button
 					type="submit"
+					size="xl"
+					variant="solid"
+					theme="blue"
+					class="w-full"
+					:loading="busy"
 					:disabled="!canSubmit"
-					class="mt-2 flex h-14 items-center justify-center rounded-card bg-brand text-[16.5px] font-bold text-white shadow-brand active:opacity-85 disabled:opacity-45"
 				>
-					<LoadingIndicator v-if="busy" class="h-5 w-5 text-white" />
-					<span v-else>Sign in</span>
-				</button>
+					Sign in
+				</Button>
 			</form>
 
-			<footer class="mt-auto flex flex-col gap-3 pt-5">
-				<p class="text-center text-[11.5px] leading-[17px] text-white/35">
+			<footer class="mt-auto flex flex-col gap-3 pt-6">
+				<p class="text-center text-p-sm text-ink-gray-5">
 					Your roles in ERPNext decide what this app shows you.<br />
 					Nothing is configured on the phone.
 				</p>
-				<div class="flex flex-col items-center gap-0.5 border-t border-white/[0.08] pt-3">
-					<span class="text-[12.5px] font-semibold text-white/55">by Yasir Shaikh</span>
-					<a href="mailto:erp.yasirshaikh@gmail.com" class="text-xs text-[#8FB0FF]">
+				<div class="flex flex-col items-center gap-0.5 border-t border-outline-gray-1 pt-3">
+					<span class="text-p-sm font-medium text-ink-gray-6">by Yasir Shaikh</span>
+					<a href="mailto:erp.yasirshaikh@gmail.com" class="text-p-sm text-ink-blue-link">
 						erp.yasirshaikh@gmail.com
 					</a>
 				</div>
@@ -116,7 +98,7 @@
 </template>
 
 <script setup>
-import { LoadingIndicator } from "frappe-ui"
+import { Alert, Button, ErrorMessage, FormControl } from "frappe-ui"
 import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
 

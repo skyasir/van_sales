@@ -12,13 +12,13 @@
 			<template #right>
 				<button
 					type="button"
-					class="flex h-9 w-9 items-center justify-center rounded-full active:bg-van-subtle"
+					class="flex h-9 w-9 items-center justify-center rounded-full active:bg-surface-gray-2"
 					aria-label="Refresh"
 					@click="reloadAll"
 				>
 					<FeatherIcon
 						name="refresh-cw"
-						class="h-[18px] w-[18px] text-van-muted"
+						class="h-[18px] w-[18px] text-ink-gray-6"
 						:class="{ 'animate-spin': busy }"
 					/>
 				</button>
@@ -26,30 +26,30 @@
 		</PageHeader>
 
 		<ScreenBody>
-			<Banner
-				v-if="!session.van"
-				variant="warning"
-				title="No van assigned"
-				body="Your user is not on a Van Sales Profile yet, so there is no warehouse to sell from. Ask your administrator to add you to one."
-			/>
+			<Alert v-if="!session.van" theme="yellow" title="No van assigned" :dismissable="false">
+				Your user is not on a Van Sales Profile yet, so there is no warehouse to sell from.
+				Ask your administrator to add you to one.
+			</Alert>
 
 			<MoneyPanel>
 				<div class="flex items-center gap-3">
 					<div class="min-w-0 flex-1">
 						<p
-							class="truncate text-[11px] font-bold uppercase tracking-[0.1em] text-white/50"
+							class="truncate text-[11px] font-bold uppercase tracking-[0.1em] text-ink-gray-5"
 						>
 							{{ session.van ? session.van.warehouse_name : "No van" }}
 						</p>
-						<p class="mt-1 text-[22px] font-semibold -tracking-[0.02em] text-white">
+						<p
+							class="mt-1 text-[22px] font-semibold -tracking-[0.02em] text-ink-gray-9"
+						>
 							Cash on hand
 						</p>
 					</div>
 					<div class="text-right">
-						<p class="money text-[26px] font-semibold text-white">
+						<p class="money text-[26px] font-semibold text-ink-gray-9">
 							{{ money(collections.data.value?.cash_on_hand ?? 0, 0) }}
 						</p>
-						<p class="mt-0.5 text-[11.5px] text-white/50">
+						<p class="mt-0.5 text-[11.5px] text-ink-gray-5">
 							{{ currency }} ·
 							{{ collections.data.value?.entries?.length ?? 0 }} receipts
 						</p>
@@ -57,15 +57,15 @@
 				</div>
 
 				<div class="mt-3.5 flex gap-2.5">
-					<PanelTile
+					<StatTile
 						label="Van stock"
 						:value="compact(stock.data.value?.total_value ?? 0)"
 					/>
-					<PanelTile
+					<StatTile
 						label="Collected"
 						:value="compact(collections.data.value?.total_collected ?? 0)"
 					/>
-					<PanelTile
+					<StatTile
 						label="Drafts"
 						:value="String(collections.data.value?.draft_count ?? 0)"
 					/>
@@ -75,16 +75,21 @@
 			<!-- Receivables belong here, not two taps away on the customer list:
 			     what the round is owed is something the rep should meet before
 			     they set off, not go looking for. -->
-			<div v-if="receivables.data.value" class="van-card p-3.5">
+			<div
+				v-if="receivables.data.value"
+				class="rounded-lg border border-outline-gray-2 bg-surface-white shadow-sm p-3.5"
+			>
 				<div class="flex items-start justify-between gap-2.5">
 					<div class="min-w-0 flex-1">
-						<p class="section-label">Total receivable</p>
+						<p class="text-p-sm font-medium uppercase tracking-wide text-ink-gray-5">
+							Total receivable
+						</p>
 						<p
-							class="money mt-1 text-[26px] font-semibold -tracking-[0.03em] text-van-text"
+							class="money mt-1 text-[26px] font-semibold -tracking-[0.03em] text-ink-gray-8"
 						>
 							{{ money(receivables.data.value.outstanding) }}
 						</p>
-						<p class="mt-0.5 text-xs text-van-muted">
+						<p class="mt-0.5 text-xs text-ink-gray-6">
 							{{ receivables.data.value.customers_with_balance }} customer{{
 								receivables.data.value.customers_with_balance === 1 ? "" : "s"
 							}}
@@ -95,7 +100,7 @@
 					<button
 						v-if="receivables.data.value.overdue > 0"
 						type="button"
-						class="shrink-0 rounded-full border border-bad-border bg-bad-wash px-2.5 py-1.5 text-[11.5px] font-bold text-[#B42318]"
+						class="shrink-0 rounded-full border border-outline-red-2 bg-surface-red-2 px-2.5 py-1.5 text-[11.5px] font-bold text-ink-red-4"
 						@click="router.push({ name: 'customers', query: { scope: 'overdue' } })"
 					>
 						{{ money(receivables.data.value.overdue, 0) }} overdue
@@ -114,8 +119,8 @@
 								class="h-[7px] w-[7px] rounded-full"
 								:style="{ backgroundColor: segment.color }"
 							/>
-							<span class="text-[11.5px] text-van-faint">{{ segment.name }}</span>
-							<span class="money text-[11.5px] font-semibold text-van-muted">
+							<span class="text-[11.5px] text-ink-gray-5">{{ segment.name }}</span>
+							<span class="money text-[11.5px] font-semibold text-ink-gray-6">
 								{{ money(segment.value, 0) }}
 							</span>
 						</div>
@@ -135,7 +140,7 @@
 					New invoice
 				</Button>
 				<Button
-					class="h-touch flex-1 !text-bad"
+					class="h-touch flex-1 !text-ink-red-3"
 					variant="outline"
 					@click="router.push({ name: 'credit-note', params: { invoice: 'new' } })"
 				>
@@ -144,10 +149,12 @@
 			</div>
 
 			<div class="flex items-center justify-between">
-				<span class="section-label">Customers with a balance</span>
+				<span class="text-p-sm font-medium uppercase tracking-wide text-ink-gray-5"
+					>Customers with a balance</span
+				>
 				<button
 					type="button"
-					class="text-[12.5px] font-semibold text-brand"
+					class="text-[12.5px] font-semibold text-ink-blue-2"
 					@click="router.push({ name: 'customers' })"
 				>
 					See all
@@ -155,7 +162,7 @@
 			</div>
 
 			<div v-if="customers.loading.value && !customers.data.value" class="py-6 text-center">
-				<LoadingIndicator class="mx-auto h-5 w-5 text-brand" />
+				<LoadingIndicator class="mx-auto h-5 w-5 text-ink-blue-2" />
 			</div>
 
 			<ErrorState
@@ -175,14 +182,14 @@
 					v-for="customer in customers.data.value.customers"
 					:key="customer.name"
 					type="button"
-					class="van-card flex items-center gap-3 p-3.5 text-left active:bg-van-bg"
+					class="rounded-lg border border-outline-gray-2 bg-surface-white shadow-sm flex items-center gap-3 p-3.5 text-left active:bg-surface-gray-1"
 					@click="router.push({ name: 'customer', params: { id: customer.name } })"
 				>
 					<div class="min-w-0 flex-1">
-						<p class="truncate text-[15px] font-semibold text-van-text">
+						<p class="truncate text-[15px] font-semibold text-ink-gray-8">
 							{{ customer.customer_name }}
 						</p>
-						<p class="mt-0.5 truncate text-xs text-van-muted">
+						<p class="mt-0.5 truncate text-xs text-ink-gray-6">
 							{{ customer.name
 							}}{{ customer.payment_terms ? ` · ${customer.payment_terms}` : "" }}
 						</p>
@@ -190,13 +197,13 @@
 					<div class="shrink-0 text-right">
 						<p
 							class="money text-[15px] font-semibold"
-							:class="customer.overdue > 0 ? 'text-bad' : 'text-van-text'"
+							:class="customer.overdue > 0 ? 'text-ink-red-3' : 'text-ink-gray-8'"
 						>
 							{{ money(customer.outstanding) }}
 						</p>
 						<p
 							class="mt-0.5 text-[11px] font-bold"
-							:class="customer.overdue > 0 ? 'text-bad' : 'text-van-faint'"
+							:class="customer.overdue > 0 ? 'text-ink-red-3' : 'text-ink-gray-5'"
 						>
 							{{
 								customer.overdue > 0
@@ -212,17 +219,16 @@
 </template>
 
 <script setup>
-import { Button, FeatherIcon, LoadingIndicator } from "frappe-ui"
+import { Alert, Button, FeatherIcon, LoadingIndicator } from "frappe-ui"
 import { computed, onMounted, ref } from "vue"
 import { useRouter } from "vue-router"
 
 import AgeingBar from "../components/AgeingBar.vue"
-import Banner from "../components/Banner.vue"
 import EmptyState from "../components/EmptyState.vue"
 import ErrorState from "../components/ErrorState.vue"
 import MoneyPanel from "../components/MoneyPanel.vue"
 import PageHeader from "../components/PageHeader.vue"
-import PanelTile from "../components/PanelTile.vue"
+import StatTile from "../components/StatTile.vue"
 import ScreenBody from "../components/ScreenBody.vue"
 import { api } from "../data/api"
 import { compact, money } from "../data/format"

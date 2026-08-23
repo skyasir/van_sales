@@ -1,17 +1,16 @@
 <template>
 	<div
-		class="flex overflow-hidden rounded bg-van-subtle"
+		class="flex overflow-hidden rounded-sm bg-surface-gray-2"
 		:style="{ height: `${height}px` }"
 		role="img"
 		:aria-label="ariaLabel"
 	>
-		<template v-if="total > 0">
-			<div
-				v-for="(segment, i) in visible"
-				:key="i"
-				:style="{ flex: segment.value, backgroundColor: segment.color }"
-			/>
-		</template>
+		<div
+			v-for="(segment, i) in visible"
+			:key="i"
+			:class="segment.class"
+			:style="{ flex: segment.value }"
+		/>
 	</div>
 </template>
 
@@ -22,19 +21,15 @@ import { money } from "../data/format"
 
 const props = defineProps({
 	segments: { type: Array, required: true },
-	height: { type: Number, default: 7 },
+	height: { type: Number, default: 8 },
 	label: { type: String, default: "Ageing" },
 })
-
-const total = computed(() => props.segments.reduce((sum, seg) => sum + Math.max(0, seg.value), 0))
 
 const visible = computed(() => props.segments.filter((seg) => seg.value > 0))
 
 // A bar with no text is invisible to a screen reader; spelling the split out
 // keeps the same information available.
 const ariaLabel = computed(
-	() =>
-		`${props.label}: ` +
-		props.segments.map((seg) => `${seg.name} ${money(seg.value)}`).join(", "),
+	() => `${props.label}: ` + props.segments.map((s) => `${s.name} ${money(s.value)}`).join(", "),
 )
 </script>

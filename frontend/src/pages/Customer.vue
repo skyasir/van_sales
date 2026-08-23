@@ -11,7 +11,7 @@
 
 		<ScreenBody>
 			<div v-if="snapshot.loading.value && !c" class="py-6 text-center">
-				<LoadingIndicator class="mx-auto h-5 w-5 text-brand" />
+				<LoadingIndicator class="mx-auto h-5 w-5 text-ink-blue-2" />
 			</div>
 
 			<ErrorState
@@ -22,32 +22,40 @@
 			/>
 
 			<template v-else-if="c">
-				<Banner
-					v-if="c.blocked"
-					variant="danger"
-					title="Account frozen"
-					body="This customer is disabled or frozen in ERPNext. No new invoice can be raised against them."
-				/>
+				<Alert v-if="c.blocked" theme="red" title="Account frozen" :dismissable="false">
+					This customer is disabled or frozen in ERPNext. No new invoice can be raised
+					against them.
+				</Alert>
 
-				<div class="van-card p-3.5">
-					<h2 class="text-[19px] font-semibold -tracking-[0.02em] text-van-text">
+				<div
+					class="rounded-lg border border-outline-gray-2 bg-surface-white shadow-sm p-3.5"
+				>
+					<h2 class="text-[19px] font-semibold -tracking-[0.02em] text-ink-gray-8">
 						{{ c.customer_name }}
 					</h2>
-					<p class="mt-1 text-[12.5px] text-van-muted">
+					<p class="mt-1 text-[12.5px] text-ink-gray-6">
 						{{ c.name }}{{ c.tax_id ? ` · TRN ${c.tax_id}` : ""
 						}}{{ c.payment_terms ? ` · ${c.payment_terms}` : "" }}
 					</p>
 
 					<div class="mt-3 flex gap-2.5">
-						<div class="flex-1 rounded-xl bg-van-bg p-3">
-							<p class="section-label">Outstanding</p>
-							<p class="money mt-1 text-lg font-semibold text-van-text">
+						<div class="flex-1 rounded-xl bg-surface-gray-1 p-3">
+							<p
+								class="text-p-sm font-medium uppercase tracking-wide text-ink-gray-5"
+							>
+								Outstanding
+							</p>
+							<p class="money mt-1 text-lg font-semibold text-ink-gray-8">
 								{{ money(c.outstanding) }}
 							</p>
 						</div>
-						<div class="flex-1 rounded-xl bg-van-bg p-3">
-							<p class="section-label">Credit limit</p>
-							<p class="money mt-1 text-lg font-semibold text-van-text">
+						<div class="flex-1 rounded-xl bg-surface-gray-1 p-3">
+							<p
+								class="text-p-sm font-medium uppercase tracking-wide text-ink-gray-5"
+							>
+								Credit limit
+							</p>
+							<p class="money mt-1 text-lg font-semibold text-ink-gray-8">
 								{{ c.credit_limit > 0 ? money(c.credit_limit, 0) : "None" }}
 							</p>
 						</div>
@@ -65,14 +73,14 @@
 						<div class="mt-2 flex justify-between">
 							<span
 								class="text-xs font-semibold"
-								:class="usedPct > 90 ? 'text-bad' : 'text-warn'"
+								:class="usedPct > 90 ? 'text-ink-red-3' : 'text-ink-amber-3'"
 							>
 								{{ usedPct.toFixed(0) }}% used ·
 								{{ money(c.credit_headroom ?? 0, 0) }} headroom
 							</span>
 							<span
 								v-if="c.overdue_invoices > 0"
-								class="text-xs font-semibold text-bad"
+								class="text-xs font-semibold text-ink-red-3"
 							>
 								{{ c.overdue_invoices }} overdue
 							</span>
@@ -98,20 +106,22 @@
 				</div>
 
 				<Button
-					class="h-touch !text-bad"
+					class="h-touch !text-ink-red-3"
 					variant="outline"
 					@click="router.push({ name: 'credit-note', params: { invoice: 'new' } })"
 				>
 					Credit note
 				</Button>
 
-				<p class="section-label mt-1">Recent activity</p>
+				<p class="text-p-sm font-medium uppercase tracking-wide text-ink-gray-5 mt-1">
+					Recent activity
+				</p>
 
 				<div
 					v-if="statement.loading.value && !statement.data.value"
 					class="py-6 text-center"
 				>
-					<LoadingIndicator class="mx-auto h-5 w-5 text-brand" />
+					<LoadingIndicator class="mx-auto h-5 w-5 text-ink-blue-2" />
 				</div>
 
 				<EmptyState
@@ -125,16 +135,16 @@
 						v-for="line in statement.data.value.lines.slice(0, 6)"
 						:key="`${line.doctype}-${line.name}`"
 						:type="line.doctype === 'Sales Invoice' ? 'button' : undefined"
-						class="van-card p-3 text-left"
-						:class="line.doctype === 'Sales Invoice' ? 'active:bg-van-bg' : ''"
+						class="rounded-lg border border-outline-gray-2 bg-surface-white shadow-sm p-3 text-left"
+						:class="line.doctype === 'Sales Invoice' ? 'active:bg-surface-gray-1' : ''"
 						@click="line.doctype === 'Sales Invoice' && openInvoice(line.name)"
 					>
 						<div class="flex gap-2">
 							<div class="min-w-0 flex-1">
-								<p class="money truncate text-[13px] font-semibold text-van-text">
+								<p class="money truncate text-[13px] font-semibold text-ink-gray-8">
 									{{ line.name }}
 								</p>
-								<p class="mt-1 truncate text-[11.5px] text-van-faint">
+								<p class="mt-1 truncate text-[11.5px] text-ink-gray-5">
 									{{ shortDate(line.date, true)
 									}}{{ line.mode_of_payment ? ` · ${line.mode_of_payment}` : "" }}
 								</p>
@@ -142,11 +152,13 @@
 							<div class="shrink-0 text-right">
 								<p
 									class="money text-[14.5px] font-semibold"
-									:class="line.amount < 0 ? 'text-ok' : 'text-van-text'"
+									:class="
+										line.amount < 0 ? 'text-ink-green-3' : 'text-ink-gray-8'
+									"
 								>
 									{{ money(line.amount) }}
 								</p>
-								<p class="mt-0.5 text-[10.5px] font-bold text-van-faint">
+								<p class="mt-0.5 text-[10.5px] font-bold text-ink-gray-5">
 									{{ line.state }}
 								</p>
 							</div>
@@ -154,12 +166,12 @@
 
 						<div
 							v-if="line.partial"
-							class="mt-2.5 flex justify-between border-t border-dashed border-van-subtle pt-2.5"
+							class="mt-2.5 flex justify-between border-t border-dashed border-outline-gray-1 pt-2.5"
 						>
-							<span class="money text-[11.5px] font-medium text-ok">
+							<span class="money text-[11.5px] font-medium text-ink-green-3">
 								Paid {{ money(line.paid) }}
 							</span>
-							<span class="money text-[11.5px] font-medium text-[#B42318]">
+							<span class="money text-[11.5px] font-medium text-ink-red-4">
 								Balance {{ money(line.balance) }}
 							</span>
 						</div>
@@ -171,12 +183,11 @@
 </template>
 
 <script setup>
-import { Button, LoadingIndicator } from "frappe-ui"
+import { Alert, Button, LoadingIndicator } from "frappe-ui"
 import { computed } from "vue"
 import { useRoute, useRouter } from "vue-router"
 
 import AgeingBar from "../components/AgeingBar.vue"
-import Banner from "../components/Banner.vue"
 import EmptyState from "../components/EmptyState.vue"
 import ErrorState from "../components/ErrorState.vue"
 import PageHeader from "../components/PageHeader.vue"

@@ -10,9 +10,11 @@
 		Bluetooth printing is not built yet; this layout is the exact content
 		that will be fed to the ESC/POS encoder when it is.
 	-->
+	<!-- Paper-white in both themes on purpose: this is a preview of a 58mm
+	     thermal slip, and the printer has no dark mode. -->
 	<div class="flex justify-center">
 		<div
-			class="w-full max-w-[302px] bg-white p-3 font-mono text-[11px] leading-[16px] text-black shadow-card"
+			class="w-full max-w-[302px] bg-white p-3 font-mono text-[11px] leading-[16px] text-black shadow-sm"
 		>
 			<p class="text-center font-bold">{{ d.company.company_name.toUpperCase() }}</p>
 			<p v-if="d.company.tax_id" class="text-center text-[10px]">
