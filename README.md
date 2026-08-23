@@ -21,6 +21,27 @@ it from the browser rather than from a store. The React Native app in
 the same whitelisted methods in `van_sales/api/`, so the backend never had to
 change.
 
+## What it needs
+
+Two bench apps, and nothing else:
+
+| App | Version | Why |
+| --- | --- | --- |
+| `frappe` | 15 or 16 | the framework |
+| `erpnext` | 15 or 16 | Sales Invoice, Payment Entry, credit limits, item pricing |
+
+`erpnext` is declared in `required_apps`, so installing without it fails with a
+clear message rather than at the first API call. `hrms` is **not** needed --
+the profile screen reads `Employee`, which lives in erpnext's Setup module,
+not in hrms.
+
+Frappe UI itself is not a bench app. It is an npm package compiled into the
+bundle at build time, so there is nothing to install on the server for it.
+
+Building the front end needs Node and yarn on whichever machine does the
+build. `yarn build` at the app root is wired to the `frontend/` build, so
+`bench build` and a Frappe Cloud deploy pick it up without extra steps.
+
 ## The Frappe UI front end
 
 ```bash
