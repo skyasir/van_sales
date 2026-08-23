@@ -1,7 +1,16 @@
 <template>
+	<!--
+		The bottom bar. Its tabs are never hardcoded per build:
+		`bootstrap.tabs[persona]` is what renders, so adding a role on the desk
+		changes the app.
+
+		A handset tab bar is the one piece of chrome Frappe UI has no component
+		for -- it is a desktop-first library -- so this is built from the
+		design system's tokens rather than from a palette of its own.
+	-->
 	<nav
 		v-if="tabs.length"
-		class="safe-bottom flex border-t border-van-border bg-van-card px-1.5 pt-2"
+		class="safe-bottom flex border-t border-outline-gray-2 bg-surface-white px-1.5 pt-2"
 		role="tablist"
 	>
 		<button
@@ -16,12 +25,16 @@
 		>
 			<FeatherIcon
 				:name="icon(tab.icon)"
-				class="h-[21px] w-[21px]"
-				:class="isActive(tab.route) ? 'text-brand' : 'text-van-placeholder'"
+				class="h-5 w-5"
+				:class="isActive(tab.route) ? 'text-ink-gray-9' : 'text-ink-gray-4'"
 			/>
 			<span
-				class="text-[10.5px] font-bold"
-				:class="isActive(tab.route) ? 'text-brand' : 'text-van-placeholder'"
+				class="text-xs"
+				:class="
+					isActive(tab.route)
+						? 'font-semibold text-ink-gray-9'
+						: 'font-medium text-ink-gray-4'
+				"
 			>
 				{{ tab.label }}
 			</span>

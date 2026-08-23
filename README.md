@@ -51,6 +51,14 @@ learn the credit limit stopped them. And a request that never left the handset
 is told apart from one the server refused, because a van drives through
 basements all day: the first is worth retrying and the second is not.
 
+**The design system is Frappe UI's, not this app's.** `tailwind.config.js`
+defines no palette: every surface, ink and outline comes from the preset's
+semantic tokens. That is what makes the light/dark switch on the Profile
+screen work at all -- there is no second set of colours to keep in step, so
+flipping the theme flips every screen at once. The two places that stay fixed
+are deliberate: the camera viewfinder, and the 58mm receipt preview, because
+the thermal printer has no dark mode.
+
 Deep links work because `website_route_rules` in `hooks.py` maps
 `/van_sales/<path>` onto the single entry page -- without it a rep who reloads
 on `/van_sales/customers` gets a 404 instead of the app.

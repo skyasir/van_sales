@@ -25,7 +25,7 @@
 		<div class="flex-1">
 			<ScreenBody>
 				<div v-if="doc.loading.value && !standalone && !d" class="py-6 text-center">
-					<LoadingIndicator class="mx-auto h-5 w-5 text-brand" />
+					<LoadingIndicator class="mx-auto h-5 w-5 text-ink-blue-2" />
 				</div>
 
 				<ErrorState
@@ -38,44 +38,55 @@
 				<template v-else>
 					<!-- Standalone needs a customer; against an invoice the customer
 					     is already settled by the parent document. -->
-					<div v-if="standalone" class="van-card p-3.5">
-						<LinkField
+					<div
+						v-if="standalone"
+						class="rounded-lg border border-outline-gray-2 bg-surface-white shadow-sm p-3.5"
+					>
+						<LinkAutocomplete
 							label="Customer"
-							required
-							clearable
-							:value="customer?.customer_name ?? ''"
-							:description="customer ? customer.name : ''"
 							placeholder="Select a customer"
-							@open="picking = 'customer'"
-							@clear="customer = null"
+							:model-value="customerOption"
+							:fetch="searchCustomerOptions"
+							@update:model-value="pickCustomer"
 						/>
 					</div>
 
-					<div v-else-if="d" class="van-card p-3.5">
-						<p class="section-label">Against</p>
-						<p class="money mt-1 text-[15px] font-semibold text-van-text">
+					<div
+						v-else-if="d"
+						class="rounded-lg border border-outline-gray-2 bg-surface-white shadow-sm p-3.5"
+					>
+						<p class="text-p-sm font-medium uppercase tracking-wide text-ink-gray-5">
+							Against
+						</p>
+						<p class="money mt-1 text-[15px] font-semibold text-ink-gray-8">
 							{{ d.name }}
 						</p>
-						<p class="mt-0.5 text-[12.5px] text-van-muted">
+						<p class="mt-0.5 text-[12.5px] text-ink-gray-6">
 							{{ d.customer_name }} · {{ shortDate(d.posting_date, true) }}
 						</p>
 					</div>
 
-					<p class="section-label">Lines to credit</p>
+					<p class="text-p-sm font-medium uppercase tracking-wide text-ink-gray-5">
+						Lines to credit
+					</p>
 
 					<EmptyState v-if="!lines.length" :text="emptyText" />
 
 					<template v-else>
-						<div v-for="line in lines" :key="line.item_code" class="van-card p-3.5">
+						<div
+							v-for="line in lines"
+							:key="line.item_code"
+							class="rounded-lg border border-outline-gray-2 bg-surface-white shadow-sm p-3.5"
+						>
 							<div class="flex gap-2.5">
 								<div class="min-w-0 flex-1">
 									<p
-										class="text-[14.5px] font-semibold leading-[19px] text-van-text"
+										class="text-[14.5px] font-semibold leading-[19px] text-ink-gray-8"
 									>
 										{{ line.item_name }}
 									</p>
 									<p
-										class="money mt-1 truncate text-[11.5px] font-medium text-van-faint"
+										class="money mt-1 truncate text-[11.5px] font-medium text-ink-gray-5"
 									>
 										{{ line.item_code }} · {{ line.uom }} ·
 										{{ money(line.rate) }}
@@ -87,11 +98,11 @@
 								<button
 									v-if="standalone"
 									type="button"
-									class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-van-border active:bg-van-subtle"
+									class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-outline-gray-2 active:bg-surface-gray-2"
 									:aria-label="`Remove ${line.item_name}`"
 									@click="removePicked(line.item_code)"
 								>
-									<FeatherIcon name="x" class="h-4 w-4 text-van-faint" />
+									<FeatherIcon name="x" class="h-4 w-4 text-ink-gray-5" />
 								</button>
 							</div>
 
@@ -103,7 +114,7 @@
 										(v) => setLineQty(line.item_code, v, line.sold)
 									"
 								/>
-								<span class="money text-[17px] font-semibold text-van-text">
+								<span class="money text-[17px] font-semibold text-ink-gray-8">
 									{{ money(line.returning * line.rate) }}
 								</span>
 							</div>
@@ -113,53 +124,48 @@
 							     not the exception. -->
 							<div
 								v-if="line.returning > 0"
-								class="mt-3 border-t border-van-subtle pt-3"
+								class="mt-3 border-t border-outline-gray-1 pt-3"
 							>
-								<p class="section-label">Reason</p>
-								<div class="mt-2 flex gap-1.5">
-									<button
-										v-for="reason in REASONS"
-										:key="reason.key"
-										type="button"
-										class="flex-1 rounded-[9px] border px-2 py-2 text-[12px] font-bold"
-										:class="
-											line.reason === reason.key
-												? 'border-brand bg-brand-wash text-brand-dark'
-												: 'border-van-border bg-van-card text-van-muted'
-										"
-										@click="reasons[line.item_code] = reason.key"
-									>
-										{{ reason.label }}
-									</button>
-								</div>
-								<p class="mt-1.5 text-[11.5px] text-van-faint">
+								<p
+									class="text-p-sm font-medium uppercase tracking-wide text-ink-gray-5"
+								>
+									Reason
+								</p>
+								<TabButtons
+									class="mt-2"
+									:model-value="line.reason"
+									:buttons="REASONS"
+									@update:model-value="(v) => (reasons[line.item_code] = v)"
+								/>
+								<p class="mt-1.5 text-[11.5px] text-ink-gray-5">
 									{{ reasonHint(line.reason) }}
 								</p>
 							</div>
 						</div>
 					</template>
 
-					<Button
+					<LinkAutocomplete
 						v-if="standalone"
-						class="h-touch"
-						variant="outline"
-						@click="picking = 'item'"
-					>
-						Add item
-					</Button>
+						placeholder="Add item"
+						:model-value="null"
+						:fetch="searchItemOptions"
+						@update:model-value="pickItem"
+					/>
 
-					<Banner v-if="error" variant="danger" title="Not raised" :body="error" />
+					<Alert v-if="error" theme="red" title="Not raised" :dismissable="false">
+						{{ error }}
+					</Alert>
 				</template>
 			</ScreenBody>
 		</div>
 
 		<div
 			v-if="lines.length"
-			class="sticky bottom-0 border-t border-van-border bg-van-card p-3.5 pb-4"
+			class="sticky bottom-0 border-t border-outline-gray-2 bg-surface-white p-3.5 pb-4"
 		>
 			<div class="flex items-baseline justify-between">
-				<span class="text-[15px] font-semibold text-van-text">Credit total</span>
-				<span class="money text-2xl font-semibold -tracking-[0.02em] text-bad">
+				<span class="text-[15px] font-semibold text-ink-gray-8">Credit total</span>
+				<span class="money text-2xl font-semibold -tracking-[0.02em] text-ink-red-3">
 					{{ money(creditTotal) }}
 				</span>
 			</div>
@@ -174,63 +180,18 @@
 				Raise credit note
 			</Button>
 		</div>
-
-		<PickerSheet
-			:open="picking === 'customer'"
-			title="Select customer"
-			placeholder="Name, code or TRN"
-			empty-text="No customer matches that search."
-			:fetch="searchCustomers"
-			:key-for="(c) => c.name"
-			@close="picking = null"
-			@select="pickCustomer"
-		>
-			<template #row="{ row }">
-				<CustomerPickRow :row="row" />
-			</template>
-		</PickerSheet>
-
-		<PickerSheet
-			:open="picking === 'item'"
-			title="Add item"
-			placeholder="Item name or code"
-			empty-text="No sales item matches that search."
-			:fetch="searchItems"
-			:key-for="(i) => i.item_code"
-			@close="picking = null"
-			@select="pickItem"
-		>
-			<template #row="{ row }">
-				<div class="flex gap-3">
-					<div class="min-w-0 flex-1">
-						<p class="line-clamp-2 text-[14.5px] font-semibold text-van-text">
-							{{ row.item_name }}
-						</p>
-						<p class="money mt-0.5 truncate text-[11.5px] font-medium text-van-faint">
-							{{ row.item_code }} · {{ row.uom }}
-						</p>
-					</div>
-					<p class="money shrink-0 text-sm font-semibold text-van-text">
-						{{ money(row.rate) }}
-					</p>
-				</div>
-			</template>
-		</PickerSheet>
 	</div>
 </template>
 
 <script setup>
-import { Button, FeatherIcon, LoadingIndicator } from "frappe-ui"
+import { Alert, Button, FeatherIcon, LoadingIndicator, TabButtons } from "frappe-ui"
 import { computed, reactive, ref } from "vue"
 import { useRoute, useRouter } from "vue-router"
 
-import Banner from "../components/Banner.vue"
-import CustomerPickRow from "../components/CustomerPickRow.vue"
 import EmptyState from "../components/EmptyState.vue"
 import ErrorState from "../components/ErrorState.vue"
-import LinkField from "../components/LinkField.vue"
+import LinkAutocomplete from "../components/LinkAutocomplete.vue"
 import PageHeader from "../components/PageHeader.vue"
-import PickerSheet from "../components/PickerSheet.vue"
 import QtyStepper from "../components/QtyStepper.vue"
 import ScreenBody from "../components/ScreenBody.vue"
 import { api } from "../data/api"
@@ -241,9 +202,9 @@ import { policy, session } from "../data/session"
 import { useAsync } from "../data/useAsync"
 
 const REASONS = [
-	{ key: "good", label: "Good stock", hint: "Returns to the van and can be sold again" },
-	{ key: "damaged", label: "Damaged", hint: "Does not go back into saleable stock" },
-	{ key: "expired", label: "Expired", hint: "Does not go back into saleable stock" },
+	{ label: "Good stock", value: "good", hint: "Returns to the van and can be sold again" },
+	{ label: "Damaged", value: "damaged", hint: "Does not go back into saleable stock" },
+	{ label: "Expired", value: "expired", hint: "Does not go back into saleable stock" },
 ]
 
 const route = useRoute()
@@ -260,8 +221,10 @@ const doc = useAsync(
 const d = computed(() => doc.data.value)
 
 const customer = ref(null)
+const customerOption = computed(() =>
+	customer.value ? { label: customer.value.customer_name, value: customer.value.name } : null,
+)
 const picked = ref([])
-const picking = ref(null)
 const qtys = reactive({})
 const reasons = reactive({})
 const posting = ref(false)
@@ -306,7 +269,7 @@ const emptyText = computed(() =>
 )
 
 function reasonHint(key) {
-	return REASONS.find((r) => r.key === key)?.hint ?? ""
+	return REASONS.find((r) => r.value === key)?.hint ?? ""
 }
 
 function setLineQty(code, next, cap) {
@@ -319,12 +282,12 @@ function removePicked(code) {
 	delete reasons[code]
 }
 
-async function searchCustomers(query) {
+async function searchCustomerOptions(query) {
 	const result = await api.listCustomers({ search: query || undefined, limit: 40 })
-	return result.customers
+	return result.customers.map((c) => ({ ...c, label: c.customer_name, value: c.name }))
 }
 
-async function searchItems(query) {
+async function searchItemOptions(query) {
 	const result = await api.searchItems({
 		query: query || undefined,
 		warehouse: session.van?.warehouse,
@@ -334,20 +297,19 @@ async function searchItems(query) {
 		currency: session.van?.currency,
 		limit: 40,
 	})
-	return result.items
+	return result.items.map((i) => ({ ...i, label: i.item_name, value: i.item_code }))
 }
 
-function pickCustomer(row) {
-	customer.value = row
-	picking.value = null
+function pickCustomer(option) {
+	customer.value = option?.value ? { ...option, name: option.value } : null
 }
 
-function pickItem(item) {
-	if (!picked.value.some((i) => i.item_code === item.item_code)) {
-		picked.value = [...picked.value, item]
+function pickItem(option) {
+	if (!option?.value) return
+	if (!picked.value.some((i) => i.item_code === option.item_code)) {
+		picked.value = [...picked.value, option]
 	}
-	setLineQty(item.item_code, (qtys[item.item_code] ?? 0) + 1)
-	picking.value = null
+	setLineQty(option.item_code, (qtys[option.item_code] ?? 0) + 1)
 }
 
 async function post() {

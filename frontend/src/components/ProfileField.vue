@@ -1,25 +1,30 @@
 <template>
-	<div class="flex flex-col gap-1">
-		<span class="section-label">{{ label }}</span>
+	<!--
+		Editable fields are real form controls; locked ones are plain text.
 
-		<input
-			v-if="editing"
-			:value="modelValue"
-			:type="type"
-			class="h-12 rounded-xl border border-van-border bg-van-card px-3.5 text-[15px] text-van-text placeholder:text-van-placeholder focus:border-brand focus:outline-none"
-			:class="{ 'font-mono': mono }"
-			@input="$emit('update:modelValue', $event.target.value)"
-		/>
+		A disabled input invites tapping and then refuses, which reads as a
+		bug. Rendering HR's record as text says plainly that it is not yours to
+		edit -- and which fields those are is the server's call, not this
+		component's.
+	-->
+	<FormControl
+		v-if="editing"
+		:label="label"
+		:type="type"
+		size="md"
+		:model-value="modelValue"
+		@update:model-value="$emit('update:modelValue', $event)"
+	/>
 
-		<!-- Locked fields read as text, not as a greyed-out input. A disabled
-		     box invites tapping; plain text says "this is not yours to edit". -->
-		<p v-else class="text-[15px] text-van-text" :class="{ money: mono }">
-			{{ modelValue || "—" }}
-		</p>
+	<div v-else class="flex flex-col gap-1">
+		<span class="text-p-sm text-ink-gray-5">{{ label }}</span>
+		<p class="text-base text-ink-gray-8" :class="{ money: mono }">{{ modelValue || "—" }}</p>
 	</div>
 </template>
 
 <script setup>
+import { FormControl } from "frappe-ui"
+
 defineProps({
 	label: { type: String, required: true },
 	modelValue: { type: [String, Number], default: "" },

@@ -9,24 +9,28 @@
 		<PageHeader :title="copy.title" :subtitle="copy.subtitle" />
 
 		<ScreenBody>
-			<div class="van-card p-3.5">
+			<div class="rounded-lg border border-outline-gray-2 bg-surface-white shadow-sm p-3.5">
 				<div class="flex items-center gap-2">
-					<FeatherIcon name="tool" class="h-[18px] w-[18px] text-warn" />
-					<span class="text-[11px] font-bold uppercase tracking-[0.08em] text-warn">
+					<FeatherIcon name="tool" class="h-[18px] w-[18px] text-ink-amber-3" />
+					<span
+						class="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-amber-3"
+					>
 						Not built yet
 					</span>
 				</div>
-				<p class="mt-2 text-sm leading-[21px] text-van-text">{{ copy.summary }}</p>
+				<p class="mt-2 text-sm leading-[21px] text-ink-gray-8">{{ copy.summary }}</p>
 			</div>
 
-			<div class="van-card p-3.5">
-				<p class="section-label">What this screen will do</p>
+			<div class="rounded-lg border border-outline-gray-2 bg-surface-white shadow-sm p-3.5">
+				<p class="text-p-sm font-medium uppercase tracking-wide text-ink-gray-5">
+					What this screen will do
+				</p>
 				<ul class="mt-2 flex flex-col gap-2">
 					<li v-for="(bullet, i) in copy.bullets" :key="i" class="flex gap-2.5">
 						<span
-							class="mt-[7px] h-[5px] w-[5px] shrink-0 rounded-full bg-van-placeholder"
+							class="mt-[7px] h-[5px] w-[5px] shrink-0 rounded-full bg-ink-gray-4"
 						/>
-						<span class="flex-1 text-[13.5px] leading-5 text-van-muted">{{
+						<span class="flex-1 text-[13.5px] leading-5 text-ink-gray-6">{{
 							bullet
 						}}</span>
 					</li>

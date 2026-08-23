@@ -18,21 +18,24 @@
 		<div class="flex-1">
 			<ScreenBody>
 				<!-- Customer ------------------------------------------------- -->
-				<div class="van-card p-3.5">
-					<LinkField
+				<div
+					class="rounded-lg border border-outline-gray-2 bg-surface-white shadow-sm p-3.5"
+				>
+					<LinkAutocomplete
 						label="Customer"
-						required
-						clearable
-						:value="cart.customer?.customer_name ?? ''"
-						:description="customerDescription"
 						placeholder="Select a customer"
-						@open="picking = 'customer'"
-						@clear="setCustomer(null)"
+						:model-value="customerOption"
+						:fetch="searchCustomerOptions"
+						@update:model-value="pickCustomer"
 					/>
+
+					<p v-if="customerDescription" class="mt-2 text-p-sm text-ink-gray-5">
+						{{ customerDescription }}
+					</p>
 
 					<p
 						v-if="cart.customer && cart.customer.credit_limit > 0"
-						class="mt-2 text-xs text-van-muted"
+						class="mt-2 text-xs text-ink-gray-6"
 					>
 						Limit {{ money(cart.customer.credit_limit, 0) }} · headroom
 						{{ money(cart.customer.credit_headroom ?? 0, 0) }}
@@ -41,8 +44,10 @@
 
 				<!-- Items --------------------------------------------------- -->
 				<div class="flex items-center justify-between">
-					<span class="section-label">Items</span>
-					<span v-if="cart.lines.length" class="text-xs font-semibold text-van-faint">
+					<span class="text-p-sm font-medium uppercase tracking-wide text-ink-gray-5"
+						>Items</span
+					>
+					<span v-if="cart.lines.length" class="text-xs font-semibold text-ink-gray-5">
 						{{ cart.lines.length }} {{ cart.lines.length === 1 ? "line" : "lines" }}
 					</span>
 				</div>
@@ -50,25 +55,31 @@
 				<EmptyState v-if="!cart.lines.length" :text="emptyText" />
 
 				<template v-else>
-					<div v-for="line in cart.lines" :key="line.item_code" class="van-card p-3.5">
+					<div
+						v-for="line in cart.lines"
+						:key="line.item_code"
+						class="rounded-lg border border-outline-gray-2 bg-surface-white shadow-sm p-3.5"
+					>
 						<div class="flex gap-2.5">
 							<div class="min-w-0 flex-1">
-								<p class="text-[14.5px] font-semibold leading-[19px] text-van-text">
+								<p
+									class="text-[14.5px] font-semibold leading-[19px] text-ink-gray-8"
+								>
 									{{ line.item_name }}
 								</p>
 								<p
-									class="money mt-1 truncate text-[11.5px] font-medium text-van-faint"
+									class="money mt-1 truncate text-[11.5px] font-medium text-ink-gray-5"
 								>
 									{{ line.item_code }} · {{ line.uom }} · {{ money(line.rate) }}
 								</p>
 							</div>
 							<button
 								type="button"
-								class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-van-border active:bg-van-subtle"
+								class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-outline-gray-2 active:bg-surface-gray-2"
 								:aria-label="`Remove ${line.item_name}`"
 								@click="remove(line.item_code)"
 							>
-								<FeatherIcon name="x" class="h-4 w-4 text-van-faint" />
+								<FeatherIcon name="x" class="h-4 w-4 text-ink-gray-5" />
 							</button>
 						</div>
 
@@ -81,7 +92,7 @@
 							/>
 
 							<div class="text-right">
-								<p class="money text-[17px] font-semibold text-van-text">
+								<p class="money text-[17px] font-semibold text-ink-gray-8">
 									{{ money(line.rate * line.qty) }}
 								</p>
 								<!-- Selling past what the van holds is allowed but never
@@ -91,8 +102,8 @@
 									class="mt-0.5 text-[11px] font-semibold"
 									:class="
 										line.qty > line.van_qty
-											? 'text-warn'
-											: 'text-van-placeholder'
+											? 'text-ink-amber-3'
+											: 'text-ink-gray-4'
 									"
 								>
 									{{
@@ -109,14 +120,14 @@
 				<!-- Adding a line. Scanning is the fast path when it is on, but
 				     there is always a way in that does not depend on it. -->
 				<div class="flex gap-2.5">
-					<Button
-						v-if="manualSearch"
-						class="h-touch flex-1"
-						:variant="scanning ? 'outline' : 'solid'"
-						@click="picking = 'item'"
-					>
-						Add item
-					</Button>
+					<div v-if="manualSearch" class="flex-1">
+						<LinkAutocomplete
+							placeholder="Add item"
+							:model-value="null"
+							:fetch="searchItemOptions"
+							@update:model-value="pickItem"
+						/>
+					</div>
 					<Button
 						v-if="scanning"
 						class="h-touch flex-1"
@@ -128,49 +139,55 @@
 					</Button>
 				</div>
 
-				<Banner v-if="error" variant="danger" title="Pricing failed" :body="error" />
+				<Alert v-if="error" theme="red" title="Pricing failed" :dismissable="false">
+					{{ error }}
+				</Alert>
 			</ScreenBody>
 		</div>
 
 		<!-- Totals ------------------------------------------------------ -->
 		<div
 			v-if="cart.lines.length"
-			class="sticky bottom-0 border-t border-van-border bg-van-card p-3.5 pb-4"
+			class="sticky bottom-0 border-t border-outline-gray-2 bg-surface-white p-3.5 pb-4"
 		>
 			<div class="mb-1 flex justify-between">
-				<span class="text-[13px] text-van-muted">
+				<span class="text-[13px] text-ink-gray-6">
 					{{ quote ? "Net total" : "Running subtotal" }}
 				</span>
-				<span class="money text-[13px] font-medium text-van-muted">
+				<span class="money text-[13px] font-medium text-ink-gray-6">
 					{{ money(quote?.net_total ?? subtotal) }}
 				</span>
 			</div>
 
 			<div v-for="(tax, i) in quote?.taxes ?? []" :key="i" class="mb-1 flex justify-between">
-				<span class="text-[13px] text-van-muted">{{ tax.description }}</span>
-				<span class="money text-[13px] font-medium text-van-muted">{{
+				<span class="text-[13px] text-ink-gray-6">{{ tax.description }}</span>
+				<span class="money text-[13px] font-medium text-ink-gray-6">{{
 					money(tax.amount)
 				}}</span>
 			</div>
 
-			<div class="mt-2 flex items-baseline justify-between border-t border-van-subtle pt-2">
-				<span class="text-[15px] font-semibold text-van-text">Total</span>
-				<span class="money text-2xl font-semibold -tracking-[0.02em] text-van-text">
+			<div
+				class="mt-2 flex items-baseline justify-between border-t border-outline-gray-1 pt-2"
+			>
+				<span class="text-[15px] font-semibold text-ink-gray-8">Total</span>
+				<span class="money text-2xl font-semibold -tracking-[0.02em] text-ink-gray-8">
 					{{ pricing && !quote ? "—" : money(quote?.grand_total ?? subtotal) }}
 				</span>
 			</div>
 
-			<Banner
+			<Alert
 				v-if="quote?.credit?.over_limit"
 				class="mt-2"
-				variant="warning"
+				theme="yellow"
 				:title="`Exceeds credit limit by ${money(quote.credit.over_by)}`"
-				:body="
+				:dismissable="false"
+			>
+				{{
 					quote.credit.blocks_credit_sale
-						? 'Cash settlement is allowed. A credit sale will be refused.'
-						: 'A credit sale is allowed but will be flagged.'
-				"
-			/>
+						? "Cash settlement is allowed. A credit sale will be refused."
+						: "A credit sale is allowed but will be flagged."
+				}}
+			</Alert>
 
 			<Button
 				class="mt-3 h-[54px] w-full"
@@ -185,66 +202,21 @@
 		</div>
 
 		<!-- Customer picker --------------------------------------------- -->
-		<PickerSheet
-			:open="picking === 'customer'"
-			title="Select customer"
-			placeholder="Name, code or TRN"
-			empty-text="No customer matches that search."
-			:fetch="searchCustomers"
-			:key-for="(c) => c.name"
-			@close="picking = null"
-			@select="pickCustomer"
-		>
-			<template #row="{ row }">
-				<CustomerPickRow :row="row" />
-			</template>
-		</PickerSheet>
 
 		<!-- Item picker -------------------------------------------------- -->
-		<PickerSheet
-			:open="picking === 'item'"
-			title="Add item"
-			placeholder="Item name or code"
-			empty-text="No sales item matches that search."
-			:fetch="searchItems"
-			:key-for="(i) => i.item_code"
-			@close="picking = null"
-			@select="pickItem"
-		>
-			<template #row="{ row }">
-				<div class="flex gap-3">
-					<div class="min-w-0 flex-1">
-						<p class="line-clamp-2 text-[14.5px] font-semibold text-van-text">
-							{{ row.item_name }}
-						</p>
-						<p class="money mt-0.5 truncate text-[11.5px] font-medium text-van-faint">
-							{{ row.item_code }} · {{ row.uom }}
-						</p>
-						<StockTag class="mt-1.5" :van-qty="row.van_qty" :uom="row.uom" />
-					</div>
-					<p class="money shrink-0 text-sm font-semibold text-van-text">
-						{{ money(row.rate) }}
-					</p>
-				</div>
-			</template>
-		</PickerSheet>
 	</div>
 </template>
 
 <script setup>
-import { Button, FeatherIcon } from "frappe-ui"
+import { Alert, Button, FeatherIcon } from "frappe-ui"
 import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 
-import Banner from "../components/Banner.vue"
-import CustomerPickRow from "../components/CustomerPickRow.vue"
 import EmptyState from "../components/EmptyState.vue"
-import LinkField from "../components/LinkField.vue"
+import LinkAutocomplete from "../components/LinkAutocomplete.vue"
 import PageHeader from "../components/PageHeader.vue"
-import PickerSheet from "../components/PickerSheet.vue"
 import QtyStepper from "../components/QtyStepper.vue"
 import ScreenBody from "../components/ScreenBody.vue"
-import StockTag from "../components/StockTag.vue"
 import { api } from "../data/api"
 import { addItem, cart, remove, setCustomer, setQty, subtotal, toPayloadItems } from "../data/cart"
 import { money, qty } from "../data/format"
@@ -256,13 +228,16 @@ const router = useRouter()
 const quote = ref(null)
 const pricing = ref(false)
 const error = ref(null)
-const picking = ref(null)
 
 const scanning = computed(() => policy.value.barcode_scanning ?? true)
 const manualSearch = computed(() => policy.value.manual_item_search ?? true)
 
 const headerSubtitle = computed(() =>
 	session.van ? `${session.van.profile} · ${session.van.warehouse_name}` : "",
+)
+
+const customerOption = computed(() =>
+	cart.customer ? { label: cart.customer.customer_name, value: cart.customer.name } : null,
 )
 
 const customerDescription = computed(() =>
@@ -314,12 +289,13 @@ watch(
 	{ immediate: true },
 )
 
-async function searchCustomers(query) {
+/** Autocomplete wants {label, value}; the rest of the row rides along. */
+async function searchCustomerOptions(query) {
 	const result = await api.listCustomers({ search: query || undefined, limit: 40 })
-	return result.customers
+	return result.customers.map((c) => ({ ...c, label: c.customer_name, value: c.name }))
 }
 
-async function searchItems(query) {
+async function searchItemOptions(query) {
 	const result = await api.searchItems({
 		query: query || undefined,
 		warehouse: session.van?.warehouse,
@@ -329,23 +305,27 @@ async function searchItems(query) {
 		currency: session.van?.currency,
 		limit: 40,
 	})
-	return result.items
+	return result.items.map((i) => ({
+		...i,
+		label: i.item_name,
+		value: i.item_code,
+		description: `${i.item_code} · ${money(i.rate)} · van ${qty(i.van_qty)}`,
+	}))
 }
 
-async function pickCustomer(row) {
-	picking.value = null
-	// The list row is enough to display, but the sell flow needs the full
-	// credit position, so read the same snapshot the customer screen uses.
+async function pickCustomer(option) {
+	if (!option?.value) return setCustomer(null)
+	// The option is enough to display, but the sell flow needs the full credit
+	// position, so read the same snapshot the customer screen uses.
 	try {
-		setCustomer(await api.customerSnapshot(row.name))
+		setCustomer(await api.customerSnapshot(option.value))
 	} catch {
-		setCustomer({ ...row, default_price_list: null, blocked: false })
+		setCustomer({ ...option, name: option.value, default_price_list: null, blocked: false })
 	}
 }
 
-function pickItem(item) {
-	addItem(item, 1)
-	picking.value = null
+function pickItem(option) {
+	if (option?.value) addItem(option, 1)
 }
 
 function goScan() {

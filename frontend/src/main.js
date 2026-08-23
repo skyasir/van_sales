@@ -5,6 +5,7 @@ import App from "./App.vue"
 import router from "./router"
 import { request } from "./data/request"
 import { watchForeground } from "./data/session"
+import { initTheme } from "./data/theme"
 import "./main.css"
 
 // Point frappe-ui's resources at this app's transport, so anything built
@@ -23,6 +24,8 @@ app.use(router)
 app.use(FrappeUI)
 app.component("Button", Button)
 
+// Before mount, so the first paint is already in the right theme.
+initTheme()
 watchForeground()
 
 app.mount("#app")

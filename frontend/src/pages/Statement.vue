@@ -11,7 +11,7 @@
 
 		<ScreenBody>
 			<div v-if="statement.loading.value && !statement.data.value" class="py-6 text-center">
-				<LoadingIndicator class="mx-auto h-5 w-5 text-brand" />
+				<LoadingIndicator class="mx-auto h-5 w-5 text-ink-blue-2" />
 			</div>
 
 			<ErrorState
@@ -22,27 +22,19 @@
 			/>
 
 			<template v-else-if="statement.data.value">
-				<div class="van-card p-3.5">
+				<div
+					class="rounded-lg border border-outline-gray-2 bg-surface-white shadow-sm p-3.5"
+				>
 					<div class="flex gap-2.5">
-						<TotalTile
-							label="Billed"
-							:value="money(d.billed)"
-							class="bg-van-bg text-van-text"
-						/>
-						<TotalTile
-							label="Paid"
-							:value="money(d.paid)"
-							class="bg-ok-wash text-[#067647]"
-						/>
-						<TotalTile
-							label="Due"
-							:value="money(d.outstanding)"
-							class="bg-bad-wash text-[#B42318]"
-						/>
+						<StatTile label="Billed" :value="money(d.billed)" tone="gray" />
+						<StatTile label="Paid" :value="money(d.paid)" tone="green" />
+						<StatTile label="Due" :value="money(d.outstanding)" tone="red" />
 					</div>
 				</div>
 
-				<p class="section-label">Last 12 months</p>
+				<p class="text-p-sm font-medium uppercase tracking-wide text-ink-gray-5">
+					Last 12 months
+				</p>
 
 				<EmptyState v-if="!d.lines.length" text="No activity on this account." />
 
@@ -52,19 +44,19 @@
 						v-for="line in d.lines"
 						:key="`${line.doctype}-${line.name}`"
 						:type="line.doctype === 'Sales Invoice' ? 'button' : undefined"
-						class="van-card border-l-[3px] p-3 text-left"
+						class="rounded-lg border border-outline-gray-2 bg-surface-white shadow-sm border-l-[3px] p-3 text-left"
 						:class="[
 							stateBorder(line.state),
-							line.doctype === 'Sales Invoice' ? 'active:bg-van-bg' : '',
+							line.doctype === 'Sales Invoice' ? 'active:bg-surface-gray-1' : '',
 						]"
 						@click="line.doctype === 'Sales Invoice' && openInvoice(line.name)"
 					>
 						<div class="flex gap-2.5">
 							<div class="min-w-0 flex-1">
-								<p class="money truncate text-[13px] font-semibold text-van-text">
+								<p class="money truncate text-[13px] font-semibold text-ink-gray-8">
 									{{ line.name }}
 								</p>
-								<p class="mt-1 truncate text-[11.5px] text-van-faint">
+								<p class="mt-1 truncate text-[11.5px] text-ink-gray-5">
 									{{ shortDate(line.date, true)
 									}}{{ line.due_date ? ` · due ${shortDate(line.due_date)}` : ""
 									}}{{ line.reference_no ? ` · ${line.reference_no}` : "" }}
@@ -73,7 +65,9 @@
 							<div class="shrink-0 text-right">
 								<p
 									class="money text-[15px] font-semibold"
-									:class="line.amount < 0 ? 'text-[#067647]' : 'text-van-text'"
+									:class="
+										line.amount < 0 ? 'text-ink-green-3' : 'text-ink-gray-8'
+									"
 								>
 									{{ money(line.amount) }}
 								</p>
@@ -88,12 +82,12 @@
 
 						<div
 							v-if="line.partial"
-							class="mt-2.5 flex justify-between border-t border-van-subtle pt-2.5"
+							class="mt-2.5 flex justify-between border-t border-outline-gray-1 pt-2.5"
 						>
-							<span class="money text-[11.5px] font-medium text-[#067647]">
+							<span class="money text-[11.5px] font-medium text-ink-green-3">
 								Paid {{ money(line.paid) }}
 							</span>
-							<span class="money text-[11.5px] font-medium text-[#B42318]">
+							<span class="money text-[11.5px] font-medium text-ink-red-4">
 								Balance {{ money(line.balance) }}
 							</span>
 						</div>
@@ -113,7 +107,7 @@ import EmptyState from "../components/EmptyState.vue"
 import ErrorState from "../components/ErrorState.vue"
 import PageHeader from "../components/PageHeader.vue"
 import ScreenBody from "../components/ScreenBody.vue"
-import TotalTile from "../components/TotalTile.vue"
+import StatTile from "../components/StatTile.vue"
 import { api } from "../data/api"
 import { money, shortDate } from "../data/format"
 import { useAsync } from "../data/useAsync"
@@ -129,26 +123,26 @@ const STATE_BORDER = {
 	OVERDUE: "border-l-bad",
 	PARTIAL: "border-l-warn",
 	RECEIPT: "border-l-ok",
-	"DRAFT RECEIPT": "border-l-brand",
+	"DRAFT RECEIPT": "border-l-outline-blue-1",
 	CREDIT: "border-l-ok",
 	PAID: "border-l-ok",
 }
 
 const STATE_TEXT = {
-	OVERDUE: "text-bad",
-	PARTIAL: "text-warn",
-	RECEIPT: "text-ok",
-	"DRAFT RECEIPT": "text-brand",
-	CREDIT: "text-ok",
-	PAID: "text-ok",
+	OVERDUE: "text-ink-red-3",
+	PARTIAL: "text-ink-amber-3",
+	RECEIPT: "text-ink-green-3",
+	"DRAFT RECEIPT": "text-ink-blue-2",
+	CREDIT: "text-ink-green-3",
+	PAID: "text-ink-green-3",
 }
 
 function stateBorder(state) {
-	return STATE_BORDER[state] ?? "border-l-van-placeholder"
+	return STATE_BORDER[state] ?? "border-l-outline-gray-3"
 }
 
 function stateText(state) {
-	return STATE_TEXT[state] ?? "text-van-placeholder"
+	return STATE_TEXT[state] ?? "text-ink-gray-4"
 }
 
 // Only invoices have a screen to open; a payment entry row stays flat rather

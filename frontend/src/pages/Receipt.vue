@@ -4,10 +4,12 @@
 		<PageHeader title="Invoice posted" :subtitle="name" :back="{ name: 'van_home' }" />
 
 		<ScreenBody>
-			<Banner variant="success" :title="`Posted · ${name}`" body="Recorded in ERPNext." />
+			<Alert theme="green" :title="`Posted · ${name}`" :dismissable="false">
+				Recorded in ERPNext.
+			</Alert>
 
 			<div v-if="doc.loading.value && !d" class="py-6 text-center">
-				<LoadingIndicator class="mx-auto h-5 w-5 text-brand" />
+				<LoadingIndicator class="mx-auto h-5 w-5 text-ink-blue-2" />
 			</div>
 
 			<ErrorState
@@ -19,9 +21,9 @@
 
 			<ReceiptPaper v-else-if="d" :d="d" />
 
-			<div class="van-card p-3.5">
-				<p class="text-[13.5px] font-semibold text-van-text">Thermal printer</p>
-				<p class="mt-0.5 text-[11.5px] leading-4 text-van-faint">
+			<div class="rounded-lg border border-outline-gray-2 bg-surface-white shadow-sm p-3.5">
+				<p class="text-[13.5px] font-semibold text-ink-gray-8">Thermal printer</p>
+				<p class="mt-0.5 text-[11.5px] leading-4 text-ink-gray-5">
 					Not connected. Bluetooth ESC/POS printing is planned but not built yet.
 				</p>
 			</div>
@@ -48,11 +50,10 @@
 </template>
 
 <script setup>
-import { Button, LoadingIndicator } from "frappe-ui"
+import { Alert, Button, LoadingIndicator } from "frappe-ui"
 import { computed } from "vue"
 import { useRoute, useRouter } from "vue-router"
 
-import Banner from "../components/Banner.vue"
 import ErrorState from "../components/ErrorState.vue"
 import PageHeader from "../components/PageHeader.vue"
 import ReceiptPaper from "../components/ReceiptPaper.vue"

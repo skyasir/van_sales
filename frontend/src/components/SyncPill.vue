@@ -1,14 +1,9 @@
 <template>
-	<div
-		class="flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1"
-		:class="tone.wrap"
-	>
-		<span class="h-[7px] w-[7px] rounded-full" :class="tone.dot" />
-		<span class="text-[11.5px] font-bold" :class="tone.text">{{ label }}</span>
-	</div>
+	<Badge :theme="theme" variant="subtle" size="sm">{{ label }}</Badge>
 </template>
 
 <script setup>
+import { Badge } from "frappe-ui"
 import { computed, onMounted, onUnmounted, ref } from "vue"
 
 const props = defineProps({
@@ -39,23 +34,8 @@ const label = computed(() => {
 	return online.value ? "Synced" : "Offline"
 })
 
-const tone = computed(() => {
-	if (!online.value)
-		return {
-			wrap: "bg-bad-wash border-bad-border",
-			dot: "bg-bad",
-			text: "text-bad-ink",
-		}
-	if (props.pending > 0)
-		return {
-			wrap: "bg-warn-wash border-warn-border",
-			dot: "bg-[#F79009]",
-			text: "text-[#B54708]",
-		}
-	return {
-		wrap: "bg-ok-wash border-ok-border",
-		dot: "bg-[#17B26A]",
-		text: "text-[#067647]",
-	}
+const theme = computed(() => {
+	if (!online.value) return "red"
+	return props.pending > 0 ? "orange" : "green"
 })
 </script>
