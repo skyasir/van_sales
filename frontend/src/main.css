@@ -1,0 +1,45 @@
+@import "frappe-ui/style.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	html,
+	body {
+		@apply h-full overscroll-none bg-surface-gray-1 text-ink-gray-8;
+	}
+
+	body {
+		/* The app is a standalone handset surface, not a document. Letting it
+		   rubber-band or text-select turns an invoice into something that
+		   feels broken in the hand. */
+		-webkit-tap-highlight-color: transparent;
+		-webkit-user-select: none;
+		user-select: none;
+	}
+
+	input,
+	textarea {
+		-webkit-user-select: text;
+		user-select: text;
+	}
+}
+
+@layer components {
+	/* Every figure that represents money is set in tabular figures, so digits
+	   line up column-wise down a column of line totals. */
+	.money {
+		@apply tabular-nums;
+	}
+
+	/* The notch and the home indicator. Without these the tab bar sits under
+	   the gesture pill on every modern handset. */
+	.safe-top {
+		padding-top: env(safe-area-inset-top);
+	}
+
+	.safe-bottom {
+		padding-bottom: env(safe-area-inset-bottom);
+	}
+}
