@@ -19,9 +19,13 @@
 		</PageHeader>
 
 		<ScreenBody>
-			<Alert v-if="!session.van" theme="yellow" title="No van assigned" :dismissable="false">
-				Without a Van Sales Profile there is no warehouse to report stock from.
-			</Alert>
+			<Alert
+				v-if="!session.van"
+				theme="yellow"
+				title="No van assigned"
+				:dismissable="false"
+				description="Without a Van Sales Profile there is no warehouse to report stock from."
+			/>
 
 			<template v-else>
 				<MoneyPanel>

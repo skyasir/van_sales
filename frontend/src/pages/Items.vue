@@ -22,10 +22,8 @@
 					theme="yellow"
 					title="Manual search is turned off"
 					:dismissable="false"
-				>
-					This site requires items to be scanned. Ask your administrator if a barcode will
-					not read.
-				</Alert>
+					description="This site requires items to be scanned. Ask your administrator if a barcode will not read."
+				/>
 
 				<template v-else>
 					<div
