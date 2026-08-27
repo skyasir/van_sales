@@ -21,7 +21,11 @@ wheels/
 .installed.cfg
 *.egg
 tags
-MANIFEST
+# Anchored to the repo root on purpose. Setuptools writes MANIFEST there, but
+# an unanchored pattern matches at any depth -- and on a case-insensitive
+# filesystem it also swallowed van_sales/public/manifest/, so the PWA icons
+# were never committed and Add to Home Screen had nothing to install with.
+/MANIFEST
 
 # Environments
 .env
