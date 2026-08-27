@@ -1,0 +1,10 @@
+{
+  "name": "van_sales",
+  "private": true,
+  "description": "Build hooks so bench installs and builds the Frappe UI front end.",
+  "scripts": {
+    "postinstall": "cd frontend && yarn install --check-files",
+    "dev": "cd frontend && yarn dev",
+    "build": "cd frontend && yarn build"
+  }
+}

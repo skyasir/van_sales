@@ -69,6 +69,23 @@ website_route_rules = [
 # Home Pages
 # ----------
 
+# A rep signing in on a handset should land in the app, not on the desk.
+# Without this Frappe sends every System User to /app, and a van sales user
+# meets a dense ERPNext workspace built for a mouse before they ever see the
+# screen meant for them.
+#
+# The order here does not matter -- Frappe picks by role -- but the roles
+# match ROLE_HOMES in van_sales/api/session.py, which is what decides the
+# screen once the app has loaded.
+role_home_page = {
+	"Van Sales User": "van_sales",
+	"Pre Sales User": "van_sales",
+	"Pre Sales Team Leader": "van_sales",
+	"Van Delivery Driver": "van_sales",
+	"Van Store Incharge": "van_sales",
+	"Van Sales Manager": "van_sales",
+}
+
 # application home page (will override Website Settings)
 # home_page = "login"
 
