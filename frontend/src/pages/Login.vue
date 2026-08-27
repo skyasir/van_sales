@@ -21,9 +21,8 @@
 				title="Offline session expired"
 				theme="yellow"
 				:dismissable="false"
-			>
-				You have been offline past the allowed window. Sign in again to keep working.
-			</Alert>
+				description="You have been offline past the allowed window. Sign in again to keep working."
+			/>
 
 			<form class="flex flex-col gap-4" @submit.prevent="submit">
 				<FormControl

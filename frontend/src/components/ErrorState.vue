@@ -7,10 +7,9 @@
 	<Alert
 		:title="offline ? 'No connection' : 'Could not load'"
 		:theme="offline ? 'yellow' : 'red'"
+		:description="message"
 		:dismissable="false"
 	>
-		{{ message }}
-
 		<template v-if="offline && onRetry" #footer>
 			<Button size="sm" @click="onRetry">Try again</Button>
 		</template>
