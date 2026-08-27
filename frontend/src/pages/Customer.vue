@@ -22,10 +22,13 @@
 			/>
 
 			<template v-else-if="c">
-				<Alert v-if="c.blocked" theme="red" title="Account frozen" :dismissable="false">
-					This customer is disabled or frozen in ERPNext. No new invoice can be raised
-					against them.
-				</Alert>
+				<Alert
+					v-if="c.blocked"
+					theme="red"
+					title="Account frozen"
+					:dismissable="false"
+					description="This customer is disabled or frozen in ERPNext. No new invoice can be raised against them."
+				/>
 
 				<div
 					class="rounded-lg border border-outline-gray-2 bg-surface-white shadow-sm p-3.5"

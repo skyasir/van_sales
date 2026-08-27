@@ -15,9 +15,12 @@
 		<PageHeader title="Payment" :subtitle="cart.customer?.customer_name ?? ''" back />
 
 		<ScreenBody v-if="!cart.customer || !cart.lines.length">
-			<Alert theme="blue" title="Nothing to settle" :dismissable="false">
-				Pick a customer and scan at least one item first.
-			</Alert>
+			<Alert
+				theme="blue"
+				title="Nothing to settle"
+				:dismissable="false"
+				description="Pick a customer and scan at least one item first."
+			/>
 			<Button
 				variant="solid"
 				theme="blue"
@@ -114,13 +117,16 @@
 				:theme="quote.credit.over_limit ? 'yellow' : 'blue'"
 				:title="creditTitle"
 				:dismissable="false"
-			>
-				{{ creditBody }}
-			</Alert>
+				:description="creditBody"
+			/>
 
-			<Alert v-if="error" theme="red" title="Not posted" :dismissable="false">
-				{{ error }}
-			</Alert>
+			<Alert
+				v-if="error"
+				theme="red"
+				title="Not posted"
+				:dismissable="false"
+				:description="error"
+			/>
 
 			<Button
 				class="h-[54px]"

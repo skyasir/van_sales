@@ -60,9 +60,13 @@
 				</MoneyPanel>
 
 				<Alert v-if="saved" theme="green" title="Profile saved" :dismissable="false" />
-				<Alert v-if="error" theme="red" title="Not saved" :dismissable="false">
-					{{ error }}
-				</Alert>
+				<Alert
+					v-if="error"
+					theme="red"
+					title="Not saved"
+					:dismissable="false"
+					:description="error"
+				/>
 
 				<p class="text-p-sm font-medium uppercase tracking-wide text-ink-gray-5">Contact</p>
 				<div
