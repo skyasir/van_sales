@@ -139,9 +139,9 @@
 					</Button>
 				</div>
 
-				<Alert v-if="error" theme="red" title="Pricing failed" :dismissable="false">
-					{{ error }}
-				</Alert>
+				<Alert v-if="error" theme="red" title="Pricing failed" :dismissable="false"
+					:description="error"
+				/>
 			</ScreenBody>
 		</div>
 
@@ -181,13 +181,12 @@
 				theme="yellow"
 				:title="`Exceeds credit limit by ${money(quote.credit.over_by)}`"
 				:dismissable="false"
-			>
-				{{
+				:description="
 					quote.credit.blocks_credit_sale
-						? "Cash settlement is allowed. A credit sale will be refused."
-						: "A credit sale is allowed but will be flagged."
-				}}
-			</Alert>
+						? 'Cash settlement is allowed. A credit sale will be refused.'
+						: 'A credit sale is allowed but will be flagged.'
+				"
+			/>
 
 			<Button
 				class="mt-3 h-[54px] w-full"

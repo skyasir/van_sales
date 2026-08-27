@@ -6,8 +6,26 @@
 
 @layer base {
 	html,
-	body {
-		@apply h-full overscroll-none bg-surface-gray-1 text-ink-gray-8;
+	body,
+	#app {
+		@apply overscroll-none bg-surface-gray-1 text-ink-gray-8;
+		/* The whole chain needs a real height or the shell collapses to its
+		   content, and the tab bar stops sitting at the bottom of the screen.
+		   #app is the easy one to miss: a percentage height against an
+		   auto-height parent resolves to auto, so h-full inside it does
+		   nothing. */
+		height: 100%;
+	}
+
+	/* On a phone the URL bar collapses as you scroll, and 100vh keeps counting
+	   the space it used to occupy -- which leaves the tab bar pushed below the
+	   fold. dvh tracks the viewport as it actually is. */
+	@supports (height: 100dvh) {
+		html,
+		body,
+		#app {
+			height: 100dvh;
+		}
 	}
 
 	body {

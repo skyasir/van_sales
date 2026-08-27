@@ -254,7 +254,9 @@ def van_stock(warehouse: str, include_zero: int = 0):
 	)
 
 	if not bins:
-		return {"warehouse": warehouse, "items": []}
+		# Same shape as the populated return -- a caller reading total_value on
+		# an empty van should get 0, not undefined.
+		return {"warehouse": warehouse, "items": [], "total_value": 0.0}
 
 	names = [b.item_code for b in bins]
 	item_names = dict(

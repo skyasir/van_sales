@@ -4,9 +4,12 @@
 		<PageHeader title="Invoice posted" :subtitle="name" :back="{ name: 'van_home' }" />
 
 		<ScreenBody>
-			<Alert theme="green" :title="`Posted · ${name}`" :dismissable="false">
-				Recorded in ERPNext.
-			</Alert>
+			<Alert
+				theme="green"
+				:title="`Posted · ${name}`"
+				:dismissable="false"
+				description="Recorded in ERPNext."
+			/>
 
 			<div v-if="doc.loading.value && !d" class="py-6 text-center">
 				<LoadingIndicator class="mx-auto h-5 w-5 text-ink-blue-2" />

@@ -152,9 +152,13 @@
 						@update:model-value="pickItem"
 					/>
 
-					<Alert v-if="error" theme="red" title="Not raised" :dismissable="false">
-						{{ error }}
-					</Alert>
+					<Alert
+						v-if="error"
+						theme="red"
+						title="Not raised"
+						:dismissable="false"
+						:description="error"
+					/>
 				</template>
 			</ScreenBody>
 		</div>

@@ -26,10 +26,13 @@
 		</PageHeader>
 
 		<ScreenBody>
-			<Alert v-if="!session.van" theme="yellow" title="No van assigned" :dismissable="false">
-				Your user is not on a Van Sales Profile yet, so there is no warehouse to sell from.
-				Ask your administrator to add you to one.
-			</Alert>
+			<Alert
+				v-if="!session.van"
+				theme="yellow"
+				title="No van assigned"
+				:dismissable="false"
+				description="Your user is not on a Van Sales Profile yet, so there is no warehouse to sell from. Ask your administrator to add you to one."
+			/>
 
 			<MoneyPanel>
 				<div class="flex items-center gap-3">
