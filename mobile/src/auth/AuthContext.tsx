@@ -29,7 +29,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { AppState } from 'react-native';
+import { AppState, Platform } from 'react-native';
 
 import { ApiError, login as loginRequest, normaliseSite, type Credentials } from '../api/client';
 import { api, type Api } from '../api/endpoints';
@@ -41,6 +41,32 @@ const KEY_LAST_SITE = 'van_sales_last_site';
 const KEY_LAST_USER = 'van_sales_last_user';
 const KEY_SIGNED_IN_AT = 'van_sales_signed_in_at';
 const KEY_ACTIVE_VAN = 'van_sales_active_van';
+
+async function getSecureItem(key: string): Promise<string | null> {
+  if (Platform.OS === 'web') {
+    return localStorage.getItem(key);
+  }
+
+  return SecureStore.getItemAsync(key);
+}
+
+async function setSecureItem(key: string, value: string): Promise<void> {
+  if (Platform.OS === 'web') {
+    localStorage.setItem(key, value);
+    return;
+  }
+
+  await SecureStore.setItemAsync(key, value);
+}
+
+async function deleteSecureItem(key: string): Promise<void> {
+  if (Platform.OS === 'web') {
+    localStorage.removeItem(key);
+    return;
+  }
+
+  await SecureStore.deleteItemAsync(key);
+}
 
 interface AuthValue {
   ready: boolean;
@@ -92,13 +118,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     (async () => {
       try {
         const [rawCreds, rawBootstrap, site, user, signedInAt, activeVan] = await Promise.all([
-          SecureStore.getItemAsync(KEY_CREDENTIALS),
-          AsyncStorage.getItem(KEY_BOOTSTRAP),
-          AsyncStorage.getItem(KEY_LAST_SITE),
-          AsyncStorage.getItem(KEY_LAST_USER),
-          AsyncStorage.getItem(KEY_SIGNED_IN_AT),
-          AsyncStorage.getItem(KEY_ACTIVE_VAN),
-        ]);
+  getSecureItem(KEY_CREDENTIALS),
+  AsyncStorage.getItem(KEY_BOOTSTRAP),
+  AsyncStorage.getItem(KEY_LAST_SITE),
+  AsyncStorage.getItem(KEY_LAST_USER),
+  AsyncStorage.getItem(KEY_SIGNED_IN_AT),
+  AsyncStorage.getItem(KEY_ACTIVE_VAN),
+]);
 
         if (site) setLastSite(site);
         if (user) setLastUser(user);
@@ -155,7 +181,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       apiSecret: result.api_secret,
     };
 
-    await SecureStore.setItemAsync(KEY_CREDENTIALS, JSON.stringify(creds));
+    await setSecureItem(KEY_CREDENTIALS, JSON.stringify(creds));
     await AsyncStorage.multiSet([
       [KEY_BOOTSTRAP, JSON.stringify(result.bootstrap)],
       [KEY_LAST_SITE, site],
@@ -171,7 +197,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
-    await SecureStore.deleteItemAsync(KEY_CREDENTIALS);
+    await deleteSecureItem(KEY_CREDENTIALS);
     await AsyncStorage.multiRemove([KEY_BOOTSTRAP, KEY_SIGNED_IN_AT, KEY_ACTIVE_VAN]);
     setCredentials(null);
     setBootstrap(null);

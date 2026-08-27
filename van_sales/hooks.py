@@ -287,3 +287,6 @@ after_migrate = "van_sales.install.after_install"
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
 
+website_route_rules = [
+    {"from_route": "/van_home", "to_route": "van_home"},
+]

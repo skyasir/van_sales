@@ -133,7 +133,7 @@ export async function call<T = unknown>(
   let url = `${base}/api/method/${dottedPath}`;
   const headers: Record<string, string> = {
     Accept: 'application/json',
-    'X-Requested-With': 'XMLHttpRequest',
+    // 'X-Requested-With': 'XMLHttpRequest',
   };
 
   if (credentials) {
