@@ -325,3 +325,21 @@ Not built yet: pre-sales orders and team-leader approval, driver trips and
 delivery confirmation, store picking and loading, the management dashboard,
 and Bluetooth ESC/POS printing. Those screens exist in the app and say so
 rather than showing placeholder data.
+
+<!-- portfolio:start -->
+---
+
+<p align="center">
+  <a href="https://yasirshaikh.in/?app=van_sales">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://yasirshaikh.in/files/yasir-logo-on-dark.svg">
+      <img src="https://yasirshaikh.in/files/yasir-logo.svg" alt="Yasir Shaikh" height="64">
+    </picture>
+  </a>
+</p>
+
+<p align="center">
+  Built by <a href="https://yasirshaikh.in/">Yasir Shaikh</a>, ERPNext consultant and Frappe developer.<br>
+  <a href="https://yasirshaikh.in/?app=van_sales">See this app on my portfolio</a>
+</p>
+<!-- portfolio:end -->
