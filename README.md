@@ -21,6 +21,18 @@ it from the browser rather than from a store. The React Native app in
 the same whitelisted methods in `van_sales/api/`, so the backend never had to
 change.
 
+## Screenshots
+
+<p>
+  <img src="docs/screenshots/van-sales-home.png" alt="Home: cash on hand, van stock and receivables for the signed-in rep" width="260">
+  <img src="docs/screenshots/van-sales-stock.png" alt="Stock on the van" width="260">
+  <img src="docs/screenshots/van-sales-new-invoice.png" alt="A new invoice, with barcode scanning" width="260">
+</p>
+
+*Home: cash on hand, van stock and receivables for the signed-in rep* · *Stock on the van* · *A new invoice, with barcode scanning*
+
+Recorded on a demo site with made-up data.
+
 ## What it needs
 
 Two bench apps, and nothing else:
