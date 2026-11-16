@@ -98,7 +98,7 @@ const routes = [
 ]
 
 const router = createRouter({
-	history: createWebHistory("/van_sales"),
+	history: createWebHistory("/"),
 	routes,
 })
 

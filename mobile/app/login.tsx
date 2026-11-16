@@ -44,15 +44,19 @@ export default function Login() {
   }, [lastSite, lastUser]);
 
   useEffect(() => {
-    if (ready && credentials) router.replace('/(app)/home');
+    if (ready && credentials) {
+      router.replace('/(app)/van_home');
+    }
   }, [ready, credentials, router]);
 
   async function submit() {
     setError(null);
     setBusy(true);
     try {
+      // await signIn(site, usr, pwd);
+      // router.replace('/(app)/home');
       await signIn(site, usr, pwd);
-      router.replace('/(app)/home');
+      router.replace('/(app)/van_home');
     } catch (e) {
       const message =
         e instanceof ApiError ? e.message : 'Could not sign in. Check the site address.';

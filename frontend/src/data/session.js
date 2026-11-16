@@ -73,36 +73,77 @@ export async function restore() {
 	const token = storedToken()
 	const signedAt = Number(localStorage.getItem(KEY_SIGNED_IN_AT) || 0)
 
-	// Served from the bench, the session cookie is the source of truth and a
-	// cached bootstrap only avoids a blank first paint. On a Capacitor build
-	// there is no cookie, so the stored key pair is what "signed in" means.
-	const hasCredential = isSameOrigin() ? Boolean(cached) : Boolean(token?.apiKey)
-
-	if (hasCredential && cached) {
-		const windowHours = cached?.policy?.offline_window_hours ?? 72
-		const expired = signedAt > 0 && Date.now() - signedAt > windowHours * 60 * 60 * 1000
-
-		if (expired) {
-			// Keep the keys -- the rep may come back into coverage and a fresh
-			// sign-in will simply reuse them -- but make the app ask.
-			state.staleSession = true
-		} else {
-			state.signedIn = true
-			applyBootstrap(cached)
-		}
-	}
-
-	if (state.signedIn) {
-		// Confirm against the server, but never let a dead network undo a
-		// session the offline window says is still good.
+	// Same-origin runs inside the normal Frappe session.
+	// The Frappe session cookie is the source of truth, so verify the
+	// current session with the server instead of requiring a cached
+	// van_sales bootstrap first.
+	if (isSameOrigin()) {
 		try {
-			await refresh()
+			const next = await api.bootstrap()
+
+			localStorage.setItem(KEY_BOOTSTRAP, JSON.stringify(next))
+			localStorage.setItem(KEY_SIGNED_IN_AT, String(Date.now()))
+
+			state.staleSession = false
+			state.signedIn = true
+			applyBootstrap(next)
+			requestLocationAccess()
 		} catch (error) {
-			if (!(error instanceof ApiError) || !error.offline) {
-				if (error?.status === 401 || error?.status === 403) await signOut()
+			// Keep the cached session for the offline window.
+			if (cached) {
+				const windowHours = cached?.policy?.offline_window_hours ?? 72
+				const expired =
+					signedAt > 0 &&
+					Date.now() - signedAt > windowHours * 60 * 60 * 1000
+
+				if (!expired) {
+					state.signedIn = true
+					applyBootstrap(cached)
+					state.staleSession = false
+				} else {
+					state.staleSession = true
+				}
+			}
+
+			// A real auth failure means the Frappe session is no longer valid.
+			if (
+				error?.status === 401 ||
+				error?.status === 403
+			) {
+				state.signedIn = false
 			}
 		}
-		requestLocationAccess()
+
+		state.ready = true
+		return
+	}
+
+	// Capacitor / external-site flow uses the stored API key.
+	if (token?.apiKey && cached) {
+		const windowHours = cached?.policy?.offline_window_hours ?? 72
+		const expired =
+			signedAt > 0 &&
+			Date.now() - signedAt > windowHours * 60 * 60 * 1000
+
+		if (!expired) {
+			state.signedIn = true
+			applyBootstrap(cached)
+
+			try {
+				await refresh()
+			} catch (error) {
+				if (
+					error instanceof ApiError &&
+					(error?.status === 401 || error?.status === 403)
+				) {
+					await signOut()
+				}
+			}
+
+			requestLocationAccess()
+		} else {
+			state.staleSession = true
+		}
 	}
 
 	state.ready = true

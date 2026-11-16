@@ -12,7 +12,7 @@ import frappe
 
 from van_sales.setup.custom_fields import create_van_sales_custom_fields
 
-# role -> what it unlocks in the app, kept in sync with van_sales.api.session
+
 APP_ROLES = {
 	"Van Sales User": "Sells from a van: invoicing, receipts, returns, replenishment.",
 	"Pre Sales User": "Takes orders at allocated customers ahead of delivery.",
@@ -26,6 +26,7 @@ APP_ROLES = {
 def after_install() -> None:
 	create_roles()
 	create_van_sales_custom_fields()
+	update_van_sales_desktop_icon()
 	frappe.db.commit()
 
 
@@ -43,3 +44,28 @@ def create_roles() -> None:
 				"description": description,
 			}
 		).insert(ignore_permissions=True)
+
+def update_van_sales_desktop_icon() -> None:
+	icon_name = "Van Sales Frontend"
+	logo = "/assets/van_sales/images/van-sales.png"
+
+	if frappe.db.exists("Desktop Icon", icon_name):
+		icon = frappe.get_doc("Desktop Icon", icon_name)
+	else:
+		icon = frappe.new_doc("Desktop Icon")
+		icon.name = icon_name
+		icon.label = icon_name
+
+	icon.app = "van_sales"
+	icon.link = "/van_sales/van_home"
+	icon.logo_url = logo
+	icon.icon = logo
+	icon.icon_type = "App"
+	icon.link_type = "External"
+	icon.sequence_id = 20
+	icon.hidden = 0
+
+	if icon.is_new():
+		icon.insert(ignore_permissions=True)
+	else:
+		icon.save(ignore_permissions=True)

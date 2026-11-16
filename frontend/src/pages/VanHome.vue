@@ -10,6 +10,14 @@
 	<div>
 		<PageHeader title="Van Sales" :subtitle="headerSubtitle">
 			<template #right>
+				 <Button
+					variant="outline"
+					theme="gray"
+					class="h-9 px-3 text-sm"
+					@click="goToDesk"
+				>
+					Desk
+				</Button>
 				<button
 					type="button"
 					class="flex h-9 w-9 items-center justify-center rounded-full active:bg-surface-gray-2"
@@ -259,7 +267,9 @@ const headerSubtitle = computed(() => {
 	if (!session.van) return name
 	return `${name} · ${session.van.vehicle ?? session.van.warehouse_name}`
 })
-
+const goToDesk = () => {
+    window.location.href = "/desk"
+}
 const BUCKET_COLOR = {
 	current: "#17B26A",
 	"1-30": "#84CAFF",

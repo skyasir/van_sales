@@ -9,7 +9,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { usePathname, useRouter } from 'expo-router';
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useAuth } from '../auth/AuthContext';
@@ -70,23 +70,53 @@ export function Header({
 }) {
   const insets = useSafeAreaInsets();
 
+  const goToDesk = () => {
+    if (Platform.OS === 'web') {
+      window.location.href = '/app';
+    }
+  };
+
   return (
     <View style={[s.header, { paddingTop: insets.top + space.md }]}>
       {!!onBack && (
-        <Pressable onPress={onBack} hitSlop={10} style={s.back} accessibilityRole="button">
+        <Pressable
+          onPress={onBack}
+          hitSlop={10}
+          style={s.back}
+          accessibilityRole="button"
+        >
           <Ionicons name="chevron-back" size={20} color={colors.text} />
         </Pressable>
       )}
+
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text style={s.title} numberOfLines={1}>
           {title}
         </Text>
+
         {!!subtitle && (
           <Text style={s.subtitle} numberOfLines={1}>
             {subtitle}
           </Text>
         )}
       </View>
+
+      {Platform.OS === 'web' && (
+        <Pressable
+          onPress={goToDesk}
+          style={s.deskButton}
+          accessibilityRole="button"
+          accessibilityLabel="Back to Desk"
+        >
+          <Ionicons
+            name="arrow-back-outline"
+            size={16}
+            color={colors.primary}
+          />
+          <Text style={s.deskButtonText}>Desk</Text>
+        </Pressable>
+      )}
+
       {right ?? <SyncPill />}
     </View>
   );
@@ -151,6 +181,24 @@ const s = StyleSheet.create({
     backgroundColor: '#F9FAFB',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  deskButton: {
+  height: 34,
+  paddingHorizontal: 11,
+  borderRadius: radius.sm,
+  borderWidth: 1,
+  borderColor: colors.border,
+  backgroundColor: '#F9FAFB',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 5,
+  },
+
+  deskButtonText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.primary,
   },
   title: { fontSize: 16, fontWeight: '600', color: colors.text, letterSpacing: -0.2 },
   subtitle: { fontSize: 11.5, color: colors.muted, marginTop: 2 },
